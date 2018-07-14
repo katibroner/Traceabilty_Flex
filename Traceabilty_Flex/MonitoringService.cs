@@ -853,7 +853,7 @@ namespace Traceabilty_Flex
             //{
             //    json = @"{""data"":"
             //            + str +
-            //            @"}},""base"": {""flex_user_code"":""A014"",""password"":""$Flex2099"",""customer_code"":""0000"",""function_name"":""lms3_oib_new_batch""}}";
+            //            @"}},""base"": {""flex_user_code"":""A014"",""password"":""$Flex2099"",""customer_code"":""0000"",""function_name"" :""lms3_oib_new_batch""}}";
 
             //    streamWriter.Write(json);
             //}
