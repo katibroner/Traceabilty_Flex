@@ -59,8 +59,8 @@ namespace Traceabilty_Flex
                 if (RegisterLineStatus(line, client))  // check client if belongs to customers and register to StatusDictionary[]
                 {
                 if (!CheckSetup(client, setup, line, out List<string> list, out List<string[]> listar))
-                    //TraceAdam(AdamSetup)
-                    EmergencyStopMethod(line, list, listar, recipe, "Wrong Unique ID in Setup:\n", (bool)DTActiveLines.Select("Line = '" + line + "'")[0]["Active"]);
+                    //TraceAdam(AdamSetup) // (bool)DTActiveLines.Select("Line = '" + line + "'")[0]["Active"]
+                    EmergencyStopMethod(line, list, null, recipe, "Wrong Unique ID in Setup:\n",false );
 
                 
                 }

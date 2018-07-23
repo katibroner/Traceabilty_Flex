@@ -162,8 +162,8 @@ namespace TraceabilityTestGui
 
                     if (last)
                     {
-                        GetActiveLines();
-                        Task task = Task.Run(() => CompareResults(line, pallet, board, setup,(bool)m_Form.DTActiveLines.Select("Line = '" + line + "'")[0]["Active"],
+                        GetActiveLines(); // (bool)m_Form.DTActiveLines.Select("Line = '" + line + "'")[0]["Active"]
+                        Task task = Task.Run(() => CompareResults(line, pallet, board, setup,false,
                             recipe, false,
                             m_Form._delay
                             ));
@@ -1047,7 +1047,8 @@ WHERE     (dbo.PCBBarcode.Barcode = N'{0}') and (dbo.Recipe.Name like N'%{1}')",
             foreach (Comp item in wrongList)
             {
                 string[] str = new string[] {
-                    item.UnitID,
+                    pallet,
+                    // item.UnitID,
                     item.Batch,
                     item.PN,
                     station,
@@ -1067,8 +1068,8 @@ WHERE     (dbo.PCBBarcode.Barcode = N'{0}') and (dbo.Recipe.Name like N'%{1}')",
             bool check2 = (bool)m_Form.DTActiveLines.Select("Line = '" + line + "'")[0]["Active"];
 
             new LogWriter("adam has stoped in line:" + line + "line Activation" + check2.ToString(),"error");
-
-            m_Form.EmergencyStopMethod(line, lt, list, recipe, "Part does not have Unique ID", (bool)m_Form.DTActiveLines.Select("Line = '" + line + "'")[0]["Active"]);
+            // (bool)m_Form.DTActiveLines.Select("Line = '" + line + "'")[0]["Active"]
+            m_Form.EmergencyStopMethod(line, lt, list, recipe, "Part does not have Unique ID",false );
         }
         #endregion
 

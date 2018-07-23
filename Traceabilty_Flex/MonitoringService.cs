@@ -485,12 +485,14 @@ namespace Traceabilty_Flex
                 int panelcount = args.BoardProcessedData.ProcessedBoards[0].PanelCount;
                 string program = args.BoardProcessedData.ProcessedBoards[0].BoardName;
                 string line = args.BoardProcessedData.Recipe.LineName;
+                DateTime time = args.BoardProcessedData.MessageSendTime;
+                string timesent = time.ToString("yyyy-MM-dd HH:mm:ss");
 
                 if (placed_total < 0)
                     placed_total = 0;
                 if (_mainservice)
-                    SendStationToQMS(line.Substring(7), stationid, Barcode, placed_total, program, panelcount);
-
+                    SendStationToQMS(line.Substring(7), stationid, Barcode, placed_total, program, panelcount, timesent);
+             
 
 
             }
@@ -1217,10 +1219,10 @@ namespace Traceabilty_Flex
                     if (str != null)
                         WriteToDB(line, str, recipe, cause);
 
-                    Utils.SendMail(Utils.GetJoinedList("trace", "select eMail from [Users] where [Admin] = '20'", ';', out string Result)    
-                       , ""
-                       , "Traceability Monitor Error"
-                       , line + ": " + message);
+                    //Utils.SendMail(Utils.GetJoinedList("trace", "select eMail from [Users] where [Admin] = '20'", ';', out string Result)    
+                    //   , ""
+                    //   , "Traceability Monitor Error"
+                    //   , line + ": " + message);
 
                     Utils.WriteLog(message);
 
@@ -1511,11 +1513,11 @@ namespace Traceabilty_Flex
         #endregion
 
 
-        private void SendStationToQMS(string line, string stationID, string pallet, int comp_place, string boardname, int panel_count)
+        private void SendStationToQMS(string line, string stationID, string pallet, int comp_place, string boardname, int panel_count, string time)
         {
            // if (panel_count == 0)
            // panel_count = GetCardsQty(boardname);
-            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+      //      string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             int board_qty = 1;
             int sub_event = 2;
             line = line.Remove(0, 5);
