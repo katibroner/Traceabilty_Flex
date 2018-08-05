@@ -12,8 +12,8 @@ namespace TraceabilityTestGui
 
         private string ServerName = "tcp:172.20.20.2";
         private string DataBaseName = "SiplacePro";
-        private string UserName = "ez";
-        private string Secret = @"$Flex2016";
+        private string UserName = "sa"; // ez
+        private string Secret = @"$Sq2010"; // $Flex2016
         public string ConnectionString { get; set; }
         public string provider = "System.Data.SqlClient";
         public string Server { set { ServerName = value; } }
