@@ -1513,11 +1513,11 @@ namespace Traceabilty_Flex
         #endregion
 
 
-        private void SendStationToQMS(string line, string stationID, string pallet, int comp_place, string boardname, int panel_count, string time)
+        private void SendStationToQMS(string line, string stationID, string pallet, int comp_place, string boardname, int panel_count, string timenew)
         {
            // if (panel_count == 0)
-           // panel_count = GetCardsQty(boardname);
-      //      string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+          //  panel_count = GetCardsQty(boardname);
+            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             int board_qty = 1;
             int sub_event = 2;
             line = line.Remove(0, 5);

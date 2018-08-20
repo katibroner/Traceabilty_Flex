@@ -64,7 +64,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
@@ -115,13 +115,11 @@
     <Reference Include="Asm.As.Oib.SIPLACEPro.LineControl.Proxy">
       <HintPath>Library\Asm.As.Oib.SIPLACEPro.LineControl.Proxy.dll</HintPath>
     </Reference>
-    <Reference Include="ASM.AS.OIB.SIPLACEPro.Optimizer.Contracts, Version=5.1.0.102, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Tmp\ASM OIB SDK 5.0\Samples\Tutorials\SIPLACE Pro Optimizer Tutorial 1\bin\Debug\ASM.AS.OIB.SIPLACEPro.Optimizer.Contracts.dll</HintPath>
+    <Reference Include="ASM.AS.OIB.SIPLACEPro.Optimizer.Contracts">
+      <HintPath>..\..\..\..\OneDrive - Flextronics\Tmp\ASM OIB SDK 5.0\Samples\Tutorials\SIPLACE Pro Optimizer Tutorial 1\bin\Debug\ASM.AS.OIB.SIPLACEPro.Optimizer.Contracts.dll</HintPath>
     </Reference>
-    <Reference Include="ASM.AS.OIB.SIPLACEPro.Optimizer.Proxy, Version=5.1.0.102, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Tmp\ASM OIB SDK 5.0\Samples\Tutorials\SIPLACE Pro Optimizer Tutorial 1\bin\Debug\ASM.AS.OIB.SIPLACEPro.Optimizer.Proxy.dll</HintPath>
+    <Reference Include="ASM.AS.OIB.SIPLACEPro.Optimizer.Proxy">
+      <HintPath>..\..\..\..\OneDrive - Flextronics\Tmp\ASM OIB SDK 5.0\Samples\Tutorials\SIPLACE Pro Optimizer Tutorial 1\bin\Debug\ASM.AS.OIB.SIPLACEPro.Optimizer.Proxy.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.SIPLACEPro.Proxy">
       <HintPath>Library\Asm.As.Oib.SIPLACEPro.Proxy.dll</HintPath>
