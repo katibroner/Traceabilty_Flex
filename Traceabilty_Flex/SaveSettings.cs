@@ -133,6 +133,39 @@ namespace Traceabilty_Flex
 
                 GetCustomerList();
             }
+            else if ((bool)checkboxRecipes.IsChecked)
+            {
+                DataTable dt = new DataTable();
+                dt = ((DataView)dataGridRecipes.ItemsSource).ToTable();
+
+                string q = @"SELECT * FROM [Traceability].[dbo].[RecipeException]";
+                DataTable du = sql.SelectDB(q, out string res);
+                if (dt.Rows.Count != du.Rows.Count)
+                {
+                    q = "truncate table [Traceability].[dbo].[RecipeException]";
+                    sql.Update(q);
+                }
+
+                foreach (DataRow item in dt.Rows)
+                {
+                    string query =
+                        string.Format(@"IF NOT EXISTS(SELECT 1 from [Traceability].[dbo].[RecipeException] where recipe = '{0}') Insert INTO [Traceability].[dbo].[RecipeException]
+                                    (recipe) VALUES('{0}')", item["recipe"]);
+                    try
+                    {
+                        sql.Update(query);
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorOut("At CustomerSettingsSaving" + ex.Message);
+                    }
+                }
+
+                GetRecipeList();
+
+
+            }
+
 
             //string qry = string.Format(@"UPDATE [Traceability].[dbo].[LineUpgrade] SET [date] =  CONVERT(VARCHAR, '{0}')", LineDatePicker.SelectedDate.Value.ToString("yyyy/MM/dd"));
             //try

@@ -25,6 +25,8 @@ namespace Traceabilty_Flex
             DataTable d4 = GetCustomers();
             dataGridCustomers.ItemsSource = d4.AsDataView();
 
+            DataTable d5 = GetRecipeList();
+            dataGridRecipes.ItemsSource = d5.AsDataView();
             //LineDatePicker.Text = GetDateLineUpgrade();
         }
 
@@ -94,7 +96,18 @@ namespace Traceabilty_Flex
             return d;
         }
 
+        private DataTable GetRecipeList()
+        {
+            SQLClass sql = new SQLClass("trace");
+            string query = @"SELECT [recipe]
+                FROM [Traceability].[dbo].[RecipeException]";
 
+            DataTable d = sql.SelectDB(query, out string result);
+
+            return d;
+
+
+        }
         private void CheckboxLines_Checked(object sender, RoutedEventArgs e)
         {
             dataGridLineConfig.IsReadOnly = false;
@@ -136,5 +149,15 @@ namespace Traceabilty_Flex
         {
             dataGridCustomers.IsReadOnly = true;
         }
+        private void CheckboxRecipes_Checked(object sender, RoutedEventArgs e)
+        {
+            dataGridRecipes.IsReadOnly = false;
+        }
+
+        private void CheckboxRecipes_Unchecked(object sender, RoutedEventArgs e)
+        {
+            dataGridRecipes.IsReadOnly = true;
+        }
+
     }
 }

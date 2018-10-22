@@ -133,6 +133,12 @@ namespace Traceabilty_Flex
                 //{
                 //    AddMessage(monitoringAdapterEP);
                 //}
+
+                //ReceiverQueue rc = new ReceiverQueue();
+                //rc.Dispose();
+                //rc.AddSubscription(_currentSubscription);
+                //int t = rc.MessageCount;
+
             }
             catch (Exception ex)
             {
@@ -302,6 +308,8 @@ namespace Traceabilty_Flex
             {
                 if(_placement)
                 {
+              
+
                     AddMessage("BoardProcessed: " +
                         args.BoardProcessedData.ProcessedBoards[0].Barcode + " " +
                         args.BoardProcessedData.ProcessedBoards[0].BoardName
@@ -363,7 +371,7 @@ namespace Traceabilty_Flex
                     };
                     listComp.Add(cp);
 
-                    if (CurrentLine == "E"  || CurrentLine == "F" || CurrentLine == "D" )
+                    if (CurrentLine == "E" || CurrentLine == "F" || CurrentLine == "D")
                     {
                         listComPilot.Add(cp);
                         //  Task task = Task.Run(() => SendToService(listComPilot));// send to db by thread
@@ -1009,6 +1017,7 @@ namespace Traceabilty_Flex
             //         test.Performance();
             Dictionary<string, string[]> stationlist = new Dictionary<string, string[]>();
             RecipeDataRecipe RecipeData = _optimizer.GetOptimizerResultsForRecipe("System\\" + line + "\\" + recipe);
+
             SQLClass sql2 = null;
             if (DTActiveLines == null)
                 GetActiveLines();

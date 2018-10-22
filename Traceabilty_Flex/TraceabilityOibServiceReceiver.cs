@@ -259,7 +259,7 @@ namespace TraceabilityTestGui
 
 		private void OverlimitStation(string line, string station)
 		{
-			m_Form.EmergencyStopMethod(line, null, null, "", "Exceeding the limit pallets after station: " + station, (bool)m_Form.AdamLimit.IsChecked);
+			m_Form.EmergencyStopMethod(line, null, null, "", "Exceeding the limit pallets after station: " + station, false);
 		}
 		#endregion
 
@@ -1063,8 +1063,9 @@ WHERE     (dbo.PCBBarcode.Barcode = N'{0}') and (dbo.Recipe.Name like N'%{1}')",
 				string ms = line + "; Station: " + station + "; Pallet: " + pallet + "; PN: " + item.PN + "; UnitID: " + item.UnitID + "; Batch: " + item.Batch ;
 				lt.Add(ms);
 			}
-			
-		  bool  check = m_Form.TraceAdam(m_Form.AdamPartNoID);
+
+			bool check = false;
+		//  bool  check = m_Form.TraceAdam(m_Form.AdamPartNoID);
 			bool check2 = (bool)m_Form.DTActiveLines.Select("Line = '" + line + "'")[0]["Active"];
 
 			new LogWriter("adam has stoped in line:" + line + "line Activation" + check2.ToString(),"error");

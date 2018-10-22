@@ -56,5 +56,8 @@ namespace Traceabilty_Flex
             Shape = "";
             TrackID = 0;
         }
+
+
+
     }
 }

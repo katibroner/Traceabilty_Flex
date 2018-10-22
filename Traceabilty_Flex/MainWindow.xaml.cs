@@ -16,6 +16,7 @@ using System.Windows.Threading;
 using TraceabilityTestGui;
 using System.Configuration;
 using System.Net;
+using Asm.As.Oib.WS.Eventing.Contracts.Data;
 
 namespace Traceabilty_Flex
 {
@@ -35,10 +36,10 @@ namespace Traceabilty_Flex
 
             monitorWorker.DoWork += MonitorWorker_DoWork; // connect to core ( subscription to oib ? )
             monitorWorker.RunWorkerCompleted += MonitorWorker_RunWorkerCompleted;
-           // qmsWorker.DoWork += QmsWorker_DoWork; // ping sending 
-           // qmsWorker.RunWorkerCompleted += QmsWorker_RunWorkerCompleted;
+            // qmsWorker.DoWork += QmsWorker_DoWork; // ping sending 
+            // qmsWorker.RunWorkerCompleted += QmsWorker_RunWorkerCompleted;
 
-            _timerLost.Elapsed += _timerLost_Elapsed;
+            //_timerLost.Elapsed += _timerLost_Elapsed;
 
             FillLineCollection(); // creates collection of lines from siplace database
             FillRecipeDT(); // fill Data Table of CURRENT Recipes [dbo.current]
@@ -57,13 +58,15 @@ namespace Traceabilty_Flex
 
             ControlInit(); // initialize all buttons / combolists / text boxes, etc....
             //qmsWorker.RunWorkerAsync();
-
+           // if (Asm.As.Oib.WS.Eventing.Contracts.Service.ISubscriptionManager.)
             _pingTimer = new DispatcherTimer();
             _pingTimer.Interval = TimeSpan.FromSeconds(10);
             _pingTimer.Tick += _pingTimer_Tick;
    //         _pingTimer.Start();// Open!!!
 
             monitorWorker.RunWorkerAsync();
+
+            //   GetAllQueues();
         }
 
         private void _pingTimer_Tick(object sender, EventArgs e)
@@ -178,6 +181,7 @@ namespace Traceabilty_Flex
 
         private void GetActiveLines()
         {
+            
             SQLClass sql = new SQLClass("trace");
             string query = @"SELECT * FROM [Traceability].[dbo].[Lines]";
 
@@ -247,11 +251,11 @@ namespace Traceabilty_Flex
             ChangeStatus(1); // set active = 1 in [dbo].status
             butStart.Visibility = Visibility.Collapsed;
 
-            if (AdamSetup != null) AdamSetup.IsEnabled = true;
-            if(AdamTrace != null) AdamTrace.IsEnabled = true;
-            if(AdamPartNoID != null) AdamPartNoID.IsEnabled = true;
-            if(AdamLimit != null) AdamLimit.IsEnabled = true;
-            if(ComboQty != null) ComboQty.IsEnabled = true;
+            //if (AdamSetup != null) AdamSetup.IsEnabled = true;
+            //if(AdamTrace != null) AdamTrace.IsEnabled = true;
+            //if(AdamPartNoID != null) AdamPartNoID.IsEnabled = true;
+            //if(AdamLimit != null) AdamLimit.IsEnabled = true;
+            //if(ComboQty != null) ComboQty.IsEnabled = true;
             //if (AdamOrder != null) AdamOrder.IsEnabled = true;
             //if (ComboMin != null) ComboMin.IsEnabled = true;
         }
@@ -351,6 +355,8 @@ namespace Traceabilty_Flex
             if (!StartTraceability())
                 ErrorOut("Traceability subscribing had failt");
         }
+
+
 
         private void MonitorWorker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -1024,8 +1030,8 @@ namespace Traceabilty_Flex
                     else
                         f.PalletDictionary.Add(pallet, f.StationDictionary[station]);
                 }
-                int qty = Convert.ToInt32(ComboQty.Text);
-
+                //int qty = Convert.ToInt32(ComboQty.Text);
+                int qty = 8;
                 #region
                 //Dictionary<int, List<string>> groups = f.PalletDictionary.GroupBy(x => x.Value)
                 //   .ToDictionary(x => x.Key, x => x.Select(i => i.Key).ToList());
@@ -1171,34 +1177,34 @@ namespace Traceabilty_Flex
         #endregion
 
         #region _timerLost_Elapsed
-        private void _timerLost_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            Task task = Task.Run(() => LookForLost());
-        }
+        //private void _timerLost_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        //{
+        //    Task task = Task.Run(() => LookForLost());
+        //}
         #endregion
 
         #region LookForLost
-        private void LookForLost()
-        {
-            foreach (Lost item in LostPallets)
-            {
-                if( DateTime.Now.ToUniversalTime().Subtract(item.time).Seconds > 60 * Convert.ToInt32(ComboMin.Text))
-                {
-                    if (!CompareByPallet(item.pallet, item.line))
-                        EmergencyStopMethod(item.line, null, null, "", "The sequence is broken. " + " Pallet: " + item.pallet, TraceAdam(AdamOrder));
-                    else
-                        ClearTraceLine(item.line, item.pallet);
+        //private void LookForLost()
+        //{
+        //    foreach (Lost item in LostPallets)
+        //    {
+        //        if( DateTime.Now.ToUniversalTime().Subtract(item.time).Seconds > 60 )
+        //        {
+        //            if (!CompareByPallet(item.pallet, item.line))
+        //                EmergencyStopMethod(item.line, null, null, "", "The sequence is broken. " + " Pallet: " + item.pallet, TraceAdam(AdamOrder));
+        //            else
+        //                ClearTraceLine(item.line, item.pallet);
 
-                    LostPallets.Remove(item);
-                }
-            }
+        //            LostPallets.Remove(item);
+        //        }
+        //    }
 
-            if(LostPallets.Count == 0)
-            {
-                _timerLost.Stop();
-                _timerLost.Enabled = false;
-            }
-        }
+        //    if(LostPallets.Count == 0)
+        //    {
+        //        _timerLost.Stop();
+        //        _timerLost.Enabled = false;
+        //    }
+        //}
         #endregion
 
         #region CompareByPallet

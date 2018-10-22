@@ -570,39 +570,23 @@
                             <CheckBox x:Name="checkboxUsers" Margin="0,0,0,5" Content="Users" FontStyle="Normal" VerticalContentAlignment="Center" VerticalAlignment="Center" FontSize="12" Unchecked="CheckboxUsers_Unchecked" Checked="CheckboxUsers_Checked"/>
                             <CheckBox x:Name="checkboxParts" FontStyle="Normal" Content="Part Exception" Padding="4,-1,0,0" VerticalContentAlignment="Center" VerticalAlignment="Center" FontSize="12" Checked="CheckboxParts_Checked" Unchecked="CheckboxParts_Unchecked" Margin="0,0,0,5"/>
                             <CheckBox x:Name="checkboxCustomers" Margin="0,0,0,5" FontStyle="Normal" Content="Customers" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="12" Checked="CheckboxCustomers_Checked" Unchecked="CheckboxCustomers_Unchecked"/>
+                            <CheckBox x:Name="checkboxRecipes" Margin="0,0,0,5" FontStyle="Normal" Content="Recipes" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="12" Checked="CheckboxRecipes_Checked" Unchecked="CheckboxRecipes_Unchecked"/>
+
                             <TextBlock x:Name="TextUpdated" FontSize="14" FontStyle="Normal" Margin="0,10,0,0"/>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Grid.Row="3" Grid.Column="1" Header="Adam" Margin="5,5,10,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="16" FontStyle="Italic" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
-                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" >
-                            <CheckBox x:Name="AdamSetup" Margin="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Content="Stop if Setup has wrong Unit ID" FontStyle="Normal" FontSize="12" IsEnabled="False" IsChecked="True"/>
-                            <CheckBox x:Name="AdamTrace" Margin="0,5,0,0" Content="Stop if Trace differs from recipe" FontStyle="Normal" FontSize="12" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" IsChecked="True" Checked="AdamTrace_Checked" Unchecked="AdamTrace_Unchecked"/>
-                            <CheckBox x:Name="AdamPartNoID" Margin="0,5,0,0" Content="Stop if Part does not have Unit ID" FontStyle="Normal" FontSize="12" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False" IsChecked="True"/>
-                            <CheckBox x:Name="AdamLimit" Margin="0,5,0,0" Content="Stop if pallet limit exceeded" FontStyle="Normal" FontSize="12" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                            <ComboBox x:Name="ComboQty" Margin="0,0,0,0" HorizontalAlignment="Left" MinWidth="50" FontSize="12" FontStyle="Normal" SelectedIndex="3" IsEnabled="False">
-                                <ComboBoxItem Content="5"/>
-                                <ComboBoxItem Content="6"/>
-                                <ComboBoxItem Content="7"/>
-                                <ComboBoxItem Content="8"/>
-                                <ComboBoxItem Content="9"/>
-                                <ComboBoxItem Content="10"/>
-                                </ComboBox>
-                                <TextBlock Margin="10,0,0,0" Text="Max qty boards after station" FontStyle="Normal" FontSize="12" VerticalAlignment="Top"/>
-                            </StackPanel>
-                            <CheckBox x:Name="AdamOrder" Margin="0,5,0,0" Content="Stop if the sequence is broken" FontStyle="Normal" FontSize="12" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" IsEnabled="False"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                <ComboBox x:Name="ComboMin" Margin="0,0,0,0" HorizontalAlignment="Left" MinWidth="50" FontSize="12" FontStyle="Normal" SelectedIndex="0" IsEnabled="False">
-                                    <ComboBoxItem Content="1"/>
-                                    <ComboBoxItem Content="2"/>
-                                    <ComboBoxItem Content="3"/>
-                                    <ComboBoxItem Content="4"/>
-                                    <ComboBoxItem Content="5"/>
-                                </ComboBox>
-                                <TextBlock Margin="10,0,0,0" Text="Time to wait for lost pallets" FontStyle="Normal" FontSize="12" VerticalAlignment="Top"/>
-                            </StackPanel>
+                    <GroupBox Grid.Row="3" Grid.Column="1" Header="Recipes" Margin="5,5,10,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="16" FontStyle="Italic" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
+                            <DataGrid x:Name="dataGridRecipes" ItemsSource="{Binding DataSource}" AutoGenerateColumns="False" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" Margin="10,15,10,10" HorizontalAlignment="Center" FontSize="12" FontStyle="Normal" MinColumnWidth="200" MaxHeight="140" VerticalAlignment="Center">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Recipe" Binding="{Binding recipe}" Width="200">
+                              
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </StackPanel>
                     </GroupBox>
+
                     <StackPanel Orientation="Horizontal" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Grid.Column="1">
                         <Button Width="75" Height="28" Margin="0" Content="Save" FontStyle="Normal" FontSize="12" Click="Button_Click"/>
                         <Button x:Name="ButtonRefresh" Width="75" Height="28" Margin="20,0,0,0" FontSize="12" FontStyle="Normal" Content="Refresh" Click="ButtonRefresh_Click" />

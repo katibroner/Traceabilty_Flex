@@ -24,7 +24,7 @@ namespace Traceabilty_Flex
     {
         public static MainWindow _mWindow;
 
-        private string MonitorCallbackEndpoint = string.Format("http://{0}:{1}/RecipeMonitoring", Environment.MachineName, "33333");
+        private string MonitorCallbackEndpoint = string.Format("http://{0}:{1}/NewMonitoringReceiver", Environment.MachineName, "33333");
         private string SubscriptionMonitorManagerEndpoint = "http://mignt048:1405/Asm.As.Oib.WS.Eventing.Services/SubscriptionManager";
         private Subscriber _subscriber;
          private LocationPcbCycle test= new LocationPcbCycle();
@@ -85,7 +85,6 @@ namespace Traceabilty_Flex
         BackgroundWorker monitorWorker = new BackgroundWorker();
         BackgroundWorker displayWorker = new BackgroundWorker();
         BackgroundWorker qmsWorker = new BackgroundWorker();
-
         internal static string User;
         internal static string Password;
         private static int Level = 1;
