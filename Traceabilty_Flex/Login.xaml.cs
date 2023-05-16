@@ -33,7 +33,5 @@ namespace Traceabilty_Flex
 
             Close();
         }
-
-      
     }
 }

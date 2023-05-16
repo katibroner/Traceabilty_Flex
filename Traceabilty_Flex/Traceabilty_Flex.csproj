@@ -8,14 +8,14 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Traceabilty_Flex</RootNamespace>
     <AssemblyName>Traceabilty_Flex</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile />
-    <PublishUrl>\\mignt002\public\smt1\Projects\Traceability2\</PublishUrl>
+    <PublishUrl>\\mignt002\public\smt1\Projects\Traceability3\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -25,7 +25,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>246</ApplicationRevision>
+    <ApplicationRevision>349</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -52,7 +52,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>logo.ico</ApplicationIcon>
+    <ApplicationIcon>Images\logo.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>25FCAA3867323ED1BDFDF9C138A8A5B2A34CD80B</ManifestCertificateThumbprint>
@@ -69,6 +69,26 @@
   <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Advantech.Adam">
       <HintPath>Library\Advantech.Adam.dll</HintPath>
@@ -79,59 +99,65 @@
     <Reference Include="Advantech.Protocol">
       <HintPath>Library\Advantech.Protocol.dll</HintPath>
     </Reference>
-    <Reference Include="Asm.As.Oib.Common">
-      <HintPath>Library\Asm.As.Oib.Common.dll</HintPath>
+    <Reference Include="Asm.As.Oib.Common.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.SPI\Asm.As.Oib.Common.Proxy.dll</HintPath>
     </Reference>
-    <Reference Include="Asm.As.Oib.Common.Proxy">
-      <HintPath>Library\Asm.As.Oib.Common.Proxy.dll</HintPath>
+    <Reference Include="ASM.AS.OIB.DisplayService.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\DisplayService\ASM.AS.OIB.DisplayService.Contracts.dll</HintPath>
     </Reference>
-    <Reference Include="Asm.As.Oib.ConfigurationManager.Contracts">
-      <HintPath>Library\Asm.As.Oib.ConfigurationManager.Contracts.dll</HintPath>
+    <Reference Include="ASM.AS.OIB.DisplayService.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\DisplayService\ASM.AS.OIB.DisplayService.Proxy.dll</HintPath>
     </Reference>
-    <Reference Include="Asm.As.Oib.ConfigurationManager.Proxy">
-      <HintPath>Library\Asm.As.Oib.ConfigurationManager.Proxy.dll</HintPath>
+    <Reference Include="Asm.As.Oib.Monitoring.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\Monitoring\Asm.As.Oib.Monitoring.Contracts.dll</HintPath>
     </Reference>
-    <Reference Include="ASM.AS.OIB.DisplayService.Contracts">
-      <HintPath>Library\ASM.AS.OIB.DisplayService.Contracts.dll</HintPath>
+    <Reference Include="Asm.As.Oib.Monitoring.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\Monitoring\Asm.As.Oib.Monitoring.Proxy.dll</HintPath>
     </Reference>
-    <Reference Include="ASM.AS.OIB.DisplayService.Proxy">
-      <HintPath>Library\ASM.AS.OIB.DisplayService.Proxy.dll</HintPath>
+    <Reference Include="Asm.As.Oib.SIPLACEPro.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.SPI\Asm.As.Oib.SIPLACEPro.Contracts.dll</HintPath>
     </Reference>
-    <Reference Include="Asm.As.Oib.Monitoring.Contracts">
-      <HintPath>Library\Asm.As.Oib.Monitoring.Contracts.dll</HintPath>
+    <Reference Include="Asm.As.Oib.SIPLACEPro.LineControl.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.LineControl\Asm.As.Oib.SIPLACEPro.LineControl.Contracts.dll</HintPath>
     </Reference>
-    <Reference Include="Asm.As.Oib.Monitoring.Proxy">
-      <HintPath>Library\Asm.As.Oib.Monitoring.Proxy.dll</HintPath>
+    <Reference Include="Asm.As.Oib.SIPLACEPro.LineControl.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.LineControl\Asm.As.Oib.SIPLACEPro.LineControl.Proxy.dll</HintPath>
     </Reference>
-    <Reference Include="ASM.AS.OIB.ServiceLocator.Contracts">
-      <HintPath>Library\ASM.AS.OIB.ServiceLocator.Contracts.dll</HintPath>
+    <Reference Include="Asm.As.Oib.SIPLACEPro.Optimizer.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.Optimizer\Asm.As.Oib.SIPLACEPro.Optimizer.Contracts.dll</HintPath>
     </Reference>
-    <Reference Include="Asm.As.Oib.SIPLACEPro.Contracts">
-      <HintPath>Library\Asm.As.Oib.SIPLACEPro.Contracts.dll</HintPath>
+    <Reference Include="Asm.As.Oib.SIPLACEPro.Optimizer.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.Optimizer\Asm.As.Oib.SIPLACEPro.Optimizer.Proxy.dll</HintPath>
     </Reference>
-    <Reference Include="Asm.As.Oib.SIPLACEPro.LineControl.Contracts">
-      <HintPath>Library\Asm.As.Oib.SIPLACEPro.LineControl.Contracts.dll</HintPath>
+    <Reference Include="Asm.As.Oib.SIPLACEPro.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.SPI\Asm.As.Oib.SIPLACEPro.Proxy.dll</HintPath>
     </Reference>
-    <Reference Include="Asm.As.Oib.SIPLACEPro.LineControl.Proxy">
-      <HintPath>Library\Asm.As.Oib.SIPLACEPro.LineControl.Proxy.dll</HintPath>
+    <Reference Include="Asm.As.Oib.SIPLACESetupCenter.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.SIPLACESetupCenter.Contracts.dll</HintPath>
     </Reference>
-    <Reference Include="ASM.AS.OIB.SIPLACEPro.Optimizer.Contracts">
-      <HintPath>..\..\..\..\OneDrive - Flextronics\Tmp\ASM OIB SDK 5.0\Samples\Tutorials\SIPLACE Pro Optimizer Tutorial 1\bin\Debug\ASM.AS.OIB.SIPLACEPro.Optimizer.Contracts.dll</HintPath>
+    <Reference Include="Asm.As.Oib.SiplaceSetupCenter.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.SiplaceSetupCenter.Proxy.dll</HintPath>
     </Reference>
-    <Reference Include="ASM.AS.OIB.SIPLACEPro.Optimizer.Proxy">
-      <HintPath>..\..\..\..\OneDrive - Flextronics\Tmp\ASM OIB SDK 5.0\Samples\Tutorials\SIPLACE Pro Optimizer Tutorial 1\bin\Debug\ASM.AS.OIB.SIPLACEPro.Optimizer.Proxy.dll</HintPath>
+    <Reference Include="Asm.As.Oib.WS.Common, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.WS.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Asm.As.Oib.SIPLACEPro.Proxy">
-      <HintPath>Library\Asm.As.Oib.SIPLACEPro.Proxy.dll</HintPath>
-    </Reference>
-    <Reference Include="Asm.As.Oib.SIPLACESetupCenter.Contracts">
-      <HintPath>Library\Asm.As.Oib.SIPLACESetupCenter.Contracts.dll</HintPath>
-    </Reference>
-    <Reference Include="Asm.As.Oib.WS.Common">
-      <HintPath>Library\Asm.As.Oib.WS.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Asm.As.Oib.WS.Eventing.Contracts">
-      <HintPath>Library\Asm.As.Oib.WS.Eventing.Contracts.dll</HintPath>
+    <Reference Include="Asm.As.Oib.WS.Eventing.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.WS.Eventing.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -157,46 +183,31 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Adam60xx.cs" />
-    <Compile Include="ButtonEvents.cs" />
-    <Compile Include="Comp.cs" />
-    <Compile Include="Display.cs" />
-    <Compile Include="DisplayMessenger.xaml.cs">
-      <DependentUpon>DisplayMessenger.xaml</DependentUpon>
+    <Compile Include="Classes\Adam60xx.cs" />
+    <Compile Include="Classes\ButtonEvents.cs" />
+    <Compile Include="Classes\Display.cs" />
+    <Compile Include="Classes\ErrorsAndMessages.cs" />
+    <Compile Include="Classes\FillRecipes.cs" />
+    <Compile Include="Classes\LineControlSubscription.cs" />
+    <Compile Include="Login.xaml.cs">
+      <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ErrorsAndMessages.cs" />
-    <Compile Include="FillRecipes.cs" />
-    <Compile Include="LineControlSubscription.cs" />
-    <Compile Include="Lines.xaml.cs">
-      <DependentUpon>Lines.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Login.xaml.cs" />
-    <Compile Include="LogWriter.cs" />
-    <Compile Include="MonitoringService.cs" />
-    <Compile Include="Position.cs" />
-    <Compile Include="proxyConfigurationManagerAndServiceLocator.cs" />
-    <Compile Include="proxyTraceability2.cs" />
-    <Compile Include="proxyWSEventing.cs" />
-    <Compile Include="SaveSettings.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="SQLClass.cs" />
-    <Compile Include="StartTraceability.cs" />
-    <Compile Include="StopStartOperations.cs" />
-    <Compile Include="TraceabilityOibServiceReceiver.cs" />
-    <Compile Include="Utils.cs" />
-    <Compile Include="Variables.cs" />
-    <Compile Include="WindowClosed.cs" />
-    <Page Include="DisplayMessenger.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Lines.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Compile Include="Classes\LogWriter.cs" />
+    <Compile Include="Classes\MonitoringService.cs" />
+    <Compile Include="Classes\Position.cs" />
+    <Compile Include="OIBProxy\proxyConfigurationManagerAndServiceLocator.cs" />
+    <Compile Include="OIBProxy\proxyTraceability2.cs" />
+    <Compile Include="OIBProxy\proxyWSEventing.cs" />
+    <Compile Include="Classes\Settings.cs" />
+    <Compile Include="Classes\SQLClass.cs" />
+    <Compile Include="Classes\StartTraceability.cs" />
+    <Compile Include="Classes\StopStartOperations.cs" />
+    <Compile Include="Classes\TraceabilityOibServiceReceiver.cs" />
+    <Compile Include="Classes\Variables.cs" />
+    <Compile Include="Classes\WindowClosed.cs" />
     <Page Include="Login.xaml">
       <SubType>Designer</SubType>
-      <Generator>XamlIntelliSenseFileGenerator</Generator>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -206,8 +217,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FlexLine.cs" />
-    <Compile Include="IOHelper.cs" />
+    <Compile Include="Classes\FlexLine.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -261,7 +271,7 @@
     <Resource Include="Images\start1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="logo.ico" />
+    <Resource Include="Images\logo.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\login4.jpg" />
@@ -300,7 +310,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="login.jpg" />
+    <Resource Include="Images\login.jpg" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
@@ -316,5 +326,6 @@
     <Resource Include="Images\send.jpg" />
     <Resource Include="Images\siemens_cut.bmp" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
