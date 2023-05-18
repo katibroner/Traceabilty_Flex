@@ -81,7 +81,7 @@ namespace Traceabilty_Flex
                             stationID = trcData.MachineID;
                             panels = trcData.Panels != null ? trcData.Panels.Length : 0;
                             Lane = trcData.Lane;
-                            if (line == "Line-R" || line == "Line-S")
+                            if (line == "Line-R" || line == "Line-S" || line == "Line-Q")
                                 line = GetLineSide(line, Lane);
 
                             if (line == "Line-C" || line == "Line-N" || line == "Line-G")
@@ -723,7 +723,7 @@ namespace Traceabilty_Flex
 
         private DataTable GetRecipe(string board, string line)
         {
-            line = line.Contains("S") ? "Line-S" : line.Contains("R") ? "Line-R" : line;
+            line = line.Contains("S") ? "Line-S" : line.Contains("R") ? "Line-R" : line.Contains("Q") ? "Line-Q" : line;
             var query = string.Format(@"SELECT TOP (100) PERCENT AliasName_3.ObjectName AS Setup, dbo.CFolder.bstrDisplayName AS Line, dbo.AliasName.ObjectName AS RecipeName, 
 					  dbo.CComponentPlacement.bstrRefDesignator AS RefDes, AliasName_2.ObjectName AS PN, AliasName_1.ObjectName AS Station, dbo.CHeadSchedule.lHeadIndex AS Location, 
 					  dbo.CPickupLink.lTrack AS Track, dbo.CPickupLink.lReserve AS Division, dbo.CPickupLink.lTower AS Tower, dbo.CPickupLink.lLevel AS [Level]

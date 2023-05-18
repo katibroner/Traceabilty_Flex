@@ -158,7 +158,7 @@ namespace Traceabilty_Flex
                 var station = args.RecipeChange.Recipe.StationName;
                 var time = args.RecipeChange.StationTime;
                 string Conveyor = args.RecipeChange.Recipe.Conveyor.ToString();
-                if (line.Contains("Line-R") || line.Contains("Line-S"))
+                if (line.Contains("Line-R") || line.Contains("Line-S")|| line.Contains("Line-Q"))
                 {
                     line = GetLineSide(line, Conveyor);
                     recipe = args.RecipeChange.Recipe.BoardName;
@@ -193,7 +193,7 @@ namespace Traceabilty_Flex
                     var station = args.DownloadRecipe.Recipe.StationName;
                     var time = args.DownloadRecipe.DownloadTime;
                     string Conveyor = args.DownloadRecipe.Recipe.Conveyor.ToString();
-                    if (lineName.Contains("Line-R") || lineName.Contains("Line-S"))
+                    if (lineName.Contains("Line-R") || lineName.Contains("Line-S")|| lineName.Contains("Line-Q"))
                     {
                         lineName = GetLineSide(lineName, Conveyor);
                         recipeName = args.DownloadRecipe.Recipe.BoardName;
