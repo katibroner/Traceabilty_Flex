@@ -25,7 +25,7 @@ namespace Traceabilty_Flex
                         string[] result = ShowLineStatus(lineControlProxy, _lines[i], "right");
                         list.Add(result);
 
-                        if (GetLeaf(_lines[i]) == "Line-R" || GetLeaf(_lines[i]) == "Line-S")
+                        if (GetLeaf(_lines[i]) == "Line-R" || GetLeaf(_lines[i]) == "Line-S" || (_lines[i]) == "Line-Q")
                         {
                             result = ShowLineStatus(lineControlProxy, _lines[i], "left");
                             list.Add(result);

@@ -148,7 +148,7 @@
                     <Grid.Background>
                         <ImageBrush Stretch="UniformToFill" ImageSource=".\Images\bg_13.jpg"/>
                     </Grid.Background>
-                    <DataGrid x:Name="GridRecipe" ItemsSource="{Binding DataSource}" AutoGenerateColumns="False" HorizontalAlignment="Left" MinWidth="450" IsReadOnly="True"  SelectionUnit="Cell" VerticalAlignment="Top">
+                    <DataGrid x:Name="GridRecipe" AutoGenerateColumns="False" HorizontalAlignment="Left" MinWidth="450" IsReadOnly="True"  SelectionUnit="Cell" VerticalAlignment="Top">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="N" Binding="{Binding id}" />
                             <DataGridTextColumn Header="Station" Binding="{Binding station}" />

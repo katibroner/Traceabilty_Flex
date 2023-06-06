@@ -25,7 +25,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>350</ApplicationRevision>
+    <ApplicationRevision>351</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -101,63 +101,63 @@
     </Reference>
     <Reference Include="Asm.As.Oib.Common.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.SPI\Asm.As.Oib.Common.Proxy.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SiplacePro.SPI\Asm.As.Oib.Common.Proxy.dll</HintPath>
     </Reference>
     <Reference Include="ASM.AS.OIB.DisplayService.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\DisplayService\ASM.AS.OIB.DisplayService.Contracts.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\DisplayService\ASM.AS.OIB.DisplayService.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="ASM.AS.OIB.DisplayService.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\DisplayService\ASM.AS.OIB.DisplayService.Proxy.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\DisplayService\ASM.AS.OIB.DisplayService.Proxy.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.Monitoring.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\Monitoring\Asm.As.Oib.Monitoring.Contracts.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\Monitoring\Asm.As.Oib.Monitoring.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.Monitoring.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\Monitoring\Asm.As.Oib.Monitoring.Proxy.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\Monitoring\Asm.As.Oib.Monitoring.Proxy.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.SIPLACEPro.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.SPI\Asm.As.Oib.SIPLACEPro.Contracts.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SiplacePro.SPI\Asm.As.Oib.SIPLACEPro.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.SIPLACEPro.LineControl.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.LineControl\Asm.As.Oib.SIPLACEPro.LineControl.Contracts.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SiplacePro.LineControl\Asm.As.Oib.SIPLACEPro.LineControl.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.SIPLACEPro.LineControl.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.LineControl\Asm.As.Oib.SIPLACEPro.LineControl.Proxy.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SiplacePro.LineControl\Asm.As.Oib.SIPLACEPro.LineControl.Proxy.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.SIPLACEPro.Optimizer.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.Optimizer\Asm.As.Oib.SIPLACEPro.Optimizer.Contracts.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SiplacePro.Optimizer\Asm.As.Oib.SIPLACEPro.Optimizer.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.SIPLACEPro.Optimizer.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.Optimizer\Asm.As.Oib.SIPLACEPro.Optimizer.Proxy.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SiplacePro.Optimizer\Asm.As.Oib.SIPLACEPro.Optimizer.Proxy.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.SIPLACEPro.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SiplacePro.SPI\Asm.As.Oib.SIPLACEPro.Proxy.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SiplacePro.SPI\Asm.As.Oib.SIPLACEPro.Proxy.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.SIPLACESetupCenter.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.SIPLACESetupCenter.Contracts.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.SIPLACESetupCenter.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.SiplaceSetupCenter.Proxy, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.SiplaceSetupCenter.Proxy.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.SiplaceSetupCenter.Proxy.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.WS.Common, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.WS.Common.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.WS.Common.dll</HintPath>
     </Reference>
     <Reference Include="Asm.As.Oib.WS.Eventing.Contracts, Version=5.3.0.60, Culture=neutral, PublicKeyToken=200430302da482e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Documents\ASM OIB SDK 5.5\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.WS.Eventing.Contracts.dll</HintPath>
+      <HintPath>C:\Program Files\ASM\ASM OIB SDK 6.3\Interfaces\Smart Proxies\SetupCenter\Asm.As.Oib.WS.Eventing.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />

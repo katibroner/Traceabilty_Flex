@@ -21,6 +21,8 @@ namespace Traceabilty_Flex
         {
             InitializeComponent();
 
+            GridLines.ItemsSource = DTRecipes.AsDataView();
+
             //Shrink_DB_Log.Tick += Shrink_DB_Log_Tick;
             //Shrink_DB_Log.Interval = new TimeSpan(1, 0, 0);
             //Shrink_DB_Log.Start();
@@ -105,10 +107,16 @@ namespace Traceabilty_Flex
 
                 Dispatcher.BeginInvoke(new Action(delegate ()
                 {
-                    GridLines.ItemsSource = null;
-                    GridLines.ItemsSource = DTRecipes.AsDataView();
+                    try
+                    {
+                        GridLines.ItemsSource = null;
+                        GridLines.ItemsSource = DTRecipes.AsDataView();
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorOut("At ShowLines: " + ex.Message);
+                    }
                 }));
-
 
                 if (result != null)
                     ErrorOut(result);
