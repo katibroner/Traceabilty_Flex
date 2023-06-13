@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using TraceabilityTestGui;
+using Traceabilty_Flex.Classes;
 using www.siplace.com.OIB._2012._03.Traceability.Contracts.Data;
 using www.siplace.com.OIB._2012._03.Traceability.Contracts.Service;
 
@@ -21,6 +23,7 @@ namespace Traceabilty_Flex
     {
         private readonly MainWindow _mainForm;
         private const string Endpoint = "http://smtoib:1405/Asm.As.Oib.WS.Eventing.Services/SubscriptionManager";
+        public  SQLdb sqlValidSide = new SQLdb(@"10.229.1.144\SMT", "Traceability", "aoi", "$Flex2016");
 
         public TraceabilityOibServiceReceiver(MainWindow form)
         {
@@ -86,7 +89,7 @@ namespace Traceabilty_Flex
 
                             if (line == "Line-C" || line == "Line-N" || line == "Line-G")
                                 line = line;
-
+                            
                             ShowActivity(trcData, line, station, pallet, recipe);
                             if (!MainWindow.StatusDictionary[line])
                                 return response;
@@ -109,6 +112,7 @@ namespace Traceabilty_Flex
                         }
                     }
                 }
+                checkSideValidation(board, pallet, line);
                 if (pallet.StartsWith("NO_PCB_BARCODE"))
                 {
                     if (_mainForm != null && _mainForm.CheckStation(line, station))
@@ -154,6 +158,82 @@ namespace Traceabilty_Flex
             }
             return response;
         }
+        private void checkSideValidation(string board, string pallet, string line)
+        {
+
+            if (board.Contains("cs"))
+            {
+                DataTable palletInTraceDB = new DataTable();
+                traceDB.openConnection();
+                traceDB.sql = "SELECT DISTINCT TOP(100) PERCENT dbo.PCBBarcode.Barcode AS PCBBarcode, SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe " +
+                          "FROM dbo.PCBBarcode FULL OUTER JOIN dbo.Setup INNER JOIN dbo.Recipe INNER JOIN dbo.Job INNER JOIN " +
+                           "dbo.TraceData INNER JOIN dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId " +
+                           "ON dbo.Recipe.id = dbo.Job.RecipeId INNER JOIN dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id " +
+                           "ON dbo.Setup.id = dbo.Job.SetupId INNER JOIN dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id " +
+                           "ON dbo.PCBBarcode.Id = dbo.TraceData.PCBBarcodeId " +
+                          "WHERE(dbo.PCBBarcode.Barcode = N'" + pallet + "') AND(SUBSTRING(dbo.Station.Name, 15, LEN(dbo.Station.Name)) LIKE 'Sipl%') ";
+
+                traceDB.cmd.CommandText = traceDB.sql;
+                traceDB.rd = traceDB.cmd.ExecuteReader();
+                palletInTraceDB.Load(traceDB.rd);
+                if(palletInTraceDB.Rows.Count == 0)
+                {
+                    _mainForm.ErrorOut("Assembly not found on board query Empty:  " + pallet);
+                    _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly not found on board:  " + pallet, true, "", "", board);
+                    
+                }
+                if(palletInTraceDB.Rows.Count > 0)
+                {
+
+                    if ((!isPcExists(palletInTraceDB)) && (!isPalletIxistsInSideValidationDb(pallet)))
+                    {
+                        _mainForm.ErrorOut("Assembly not found on board:  " + pallet);
+                        _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly not found on board:  " + pallet, true, "", "", board);
+
+                    }
+                }
+
+            }
+        }
+        private static bool isPcExists(DataTable tbl)
+        {
+            bool x = false;
+            for (int i = 0; i < tbl.Rows.Count; i++)
+            {
+                if (tbl.Rows[i][1].ToString().Contains("ps"))
+                {
+
+                    x = true;
+                }
+
+            }
+            return x;
+
+        }
+        private static bool isPalletIxistsInSideValidationDb(string pallet)
+        {
+            string connectionString = @"Data Source=migsqlclu4\smt;Initial Catalog=Traceability;Persist Security Info=True;User ID=aoi;Password=$Flex2016";
+            string qry = string.Format("IF EXISTS (SELECT TOP (1000) [Pallet] FROM [Traceability].[dbo].[SideValidation] WHERE Pallet = @plt ) SELECT 1 ELSE SELECT 0");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(qry, connection))
+                {
+                    command.Parameters.AddWithValue("@plt", pallet);
+                    connection.Open();
+                    int result = (int)command.ExecuteScalar();
+                    if(result == 0)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+
+                }
+            }
+                
+        }
 
         private string GetLineSide(string line, string Convayer)
         {
@@ -193,6 +273,7 @@ namespace Traceabilty_Flex
 
         private void ShowActivity(TraceabilityData trcData, string line, string station, string pallet, string board)
         {
+
             var time = DateTime.Now.ToString("HH:mm:ss");
             _mainForm.MessageOut(time + "\tProgram:  " + board + "\tStation:  " + station + "\tPallet:  " + pallet);
 
@@ -344,7 +425,7 @@ namespace Traceabilty_Flex
                 barInvoker.DoWork += delegate
                 {
                     //Thread.Sleep(TimeSpan.FromSeconds(delay));
-                    Thread.Sleep(TimeSpan.FromSeconds(360));
+                    Thread.Sleep(TimeSpan.FromSeconds(600));
 
                     var task = Task.Run(() => CompareResults(line, pallet, board, setup, b, recipe, true, delay, Lane, boardSide));
                 };

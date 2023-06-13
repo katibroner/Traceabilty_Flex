@@ -48,8 +48,8 @@ namespace Traceabilty_Flex
             else if (name == "setup_trace")
             {
                 _serverName = "tcp:172.20.20.4";
-                _userName = "sa";
-                _secret = "$Sq2010";
+                _userName = "aoi";
+                _secret = "$Flex2016";
                 name = _dataBaseName = "TraceDB";
             }
             else if (name == "trace")

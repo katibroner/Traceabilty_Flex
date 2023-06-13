@@ -82,6 +82,7 @@ namespace Traceabilty_Flex
             GetExcludedPartsList(); // parts that should be checked 
             GetCustomerList(); // get customers in one string
             GetStatusLines(); // get a table of current lines ( line, recepie, and time )
+           
         }
 
         private void GetActiveLines()
