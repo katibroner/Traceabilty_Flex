@@ -158,44 +158,72 @@ namespace Traceabilty_Flex
             }
             return response;
         }
+        private static bool isBoardDubleSided(string board)
+        {
+            string originalBoard = board;
+            string newBoardWithinCS = originalBoard.Substring(0, originalBoard.Length - 2);
+            DataTable tbl = new DataTable();
+            SiplacePro.openConnection();
+            SiplacePro.sql = "SELECT    TOP (100) PERCENT dbo.AliasName.ObjectName FROM dbo.CBoard " +
+                "INNER JOIN dbo.AliasName ON dbo.CBoard.OID = dbo.AliasName.PID " +
+                "WHERE(dbo.AliasName.ObjectName LIKE N'%" + newBoardWithinCS + "%')";
+            SiplacePro.cmd.CommandText = SiplacePro.sql;
+            SiplacePro.rd = SiplacePro.cmd.ExecuteReader();
+            tbl.Load(SiplacePro.rd);
+            bool x = false;
+            for (int i = 0; i < tbl.Rows.Count; i++)
+            {
+                if (tbl.Rows[i][0].ToString().Contains("ps"))
+                {
+
+                    x = true;
+                }
+            }
+            return x;
+        }
         private void checkSideValidation(string board, string pallet, string line)
         {
-
-            if (board.Contains("cs"))
+            if (isBoardDubleSided(board))
             {
-                DataTable palletInTraceDB = new DataTable();
-                traceDB.openConnection();
-                traceDB.sql = "SELECT DISTINCT TOP(100) PERCENT dbo.PCBBarcode.Barcode AS PCBBarcode, SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe " +
-                          "FROM dbo.PCBBarcode FULL OUTER JOIN dbo.Setup INNER JOIN dbo.Recipe INNER JOIN dbo.Job INNER JOIN " +
-                           "dbo.TraceData INNER JOIN dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId " +
-                           "ON dbo.Recipe.id = dbo.Job.RecipeId INNER JOIN dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id " +
-                           "ON dbo.Setup.id = dbo.Job.SetupId INNER JOIN dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id " +
-                           "ON dbo.PCBBarcode.Id = dbo.TraceData.PCBBarcodeId " +
-                          "WHERE(dbo.PCBBarcode.Barcode = N'" + pallet + "') AND(SUBSTRING(dbo.Station.Name, 15, LEN(dbo.Station.Name)) LIKE 'Sipl%') ";
-
-                traceDB.cmd.CommandText = traceDB.sql;
-                traceDB.rd = traceDB.cmd.ExecuteReader();
-                palletInTraceDB.Load(traceDB.rd);
-                if(palletInTraceDB.Rows.Count == 0)
+                if (board.Contains("cs"))
                 {
-                    _mainForm.ErrorOut("Assembly not found on board query Empty:  " + pallet);
-                    _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly not found on board:  " + pallet, true, "", "", board);
-                    
-                }
-                if(palletInTraceDB.Rows.Count > 0)
-                {
+                    DataTable palletInTraceDB = new DataTable();
+                    traceDB.openConnection();
+                    traceDB.sql = "SELECT DISTINCT TOP(100) PERCENT dbo.PCBBarcode.Barcode AS PCBBarcode, SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe " +
+                              "FROM dbo.PCBBarcode FULL OUTER JOIN dbo.Setup INNER JOIN dbo.Recipe INNER JOIN dbo.Job INNER JOIN " +
+                               "dbo.TraceData INNER JOIN dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId " +
+                               "ON dbo.Recipe.id = dbo.Job.RecipeId INNER JOIN dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id " +
+                               "ON dbo.Setup.id = dbo.Job.SetupId INNER JOIN dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id " +
+                               "ON dbo.PCBBarcode.Id = dbo.TraceData.PCBBarcodeId " +
+                              "WHERE(dbo.PCBBarcode.Barcode = N'" + pallet + "') AND(SUBSTRING(dbo.Station.Name, 15, LEN(dbo.Station.Name)) LIKE 'Sipl%') ";
 
-                    if ((!isPcExists(palletInTraceDB)) && (!isPalletIxistsInSideValidationDb(pallet)))
+                    traceDB.cmd.CommandText = traceDB.sql;
+                    traceDB.rd = traceDB.cmd.ExecuteReader();
+                    palletInTraceDB.Load(traceDB.rd);
+                    if (palletInTraceDB.Rows.Count == 0)
                     {
-                        _mainForm.ErrorOut("Assembly not found on board:  " + pallet);
-                        _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly not found on board:  " + pallet, true, "", "", board);
+                        _mainForm.ErrorOut("Assembly ps side not found on board :  " + pallet+" => " + line);
+                        _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly ps side not found on board:  " + pallet + " => " + line, true, "", "", board);
 
                     }
-                }
+                    if (palletInTraceDB.Rows.Count > 0)
+                    {
 
+                        if ((!isPsExists(palletInTraceDB)) && (!isPalletIxistsInSideValidationDb(pallet)))
+                        {
+                            _mainForm.ErrorOut("Assembly ps side not found on board:  " + pallet + " => " + line);
+                            _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly ps side not found on board:  " + pallet + " => " + line, true, "", "", board);
+
+                        }
+                    }
+
+                }
             }
+
+
         }
-        private static bool isPcExists(DataTable tbl)
+
+        private static bool isPsExists(DataTable tbl)
         {
             bool x = false;
             for (int i = 0; i < tbl.Rows.Count; i++)
@@ -425,7 +453,7 @@ namespace Traceabilty_Flex
                 barInvoker.DoWork += delegate
                 {
                     //Thread.Sleep(TimeSpan.FromSeconds(delay));
-                    Thread.Sleep(TimeSpan.FromSeconds(600));
+                    Thread.Sleep(TimeSpan.FromSeconds(360));
 
                     var task = Task.Run(() => CompareResults(line, pallet, board, setup, b, recipe, true, delay, Lane, boardSide));
                 };

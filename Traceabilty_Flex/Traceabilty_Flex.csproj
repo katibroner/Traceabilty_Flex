@@ -189,6 +189,7 @@
     <Compile Include="Classes\ErrorsAndMessages.cs" />
     <Compile Include="Classes\FillRecipes.cs" />
     <Compile Include="Classes\LineControlSubscription.cs" />
+    <Compile Include="Classes\SiplacePro.cs" />
     <Compile Include="Classes\SQLdb.cs" />
     <Compile Include="Classes\traceDB.cs" />
     <Compile Include="Login.xaml.cs">
