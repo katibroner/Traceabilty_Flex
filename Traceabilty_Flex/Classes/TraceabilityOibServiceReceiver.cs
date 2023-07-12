@@ -23,7 +23,7 @@ namespace Traceabilty_Flex
     {
         private readonly MainWindow _mainForm;
         private const string Endpoint = "http://smtoib:1405/Asm.As.Oib.WS.Eventing.Services/SubscriptionManager";
-        public  SQLdb sqlValidSide = new SQLdb(@"10.229.1.144\SMT", "Traceability", "aoi", "$Flex2016");
+        public SQLdb sqlValidSide = new SQLdb(@"10.229.1.144\SMT", "Traceability", "aoi", "$Flex2016");
 
         public TraceabilityOibServiceReceiver(MainWindow form)
         {
@@ -89,7 +89,7 @@ namespace Traceabilty_Flex
 
                             if (line == "Line-C" || line == "Line-N" || line == "Line-G")
                                 line = line;
-                            
+
                             ShowActivity(trcData, line, station, pallet, recipe);
                             if (!MainWindow.StatusDictionary[line])
                                 return response;
@@ -158,10 +158,13 @@ namespace Traceabilty_Flex
             }
             return response;
         }
+       
         private static bool isBoardDubleSided(string board)
         {
             string originalBoard = board;
-            string newBoardWithinCS = originalBoard.Substring(0, originalBoard.Length - 2);
+            string str = "cs";
+            int index = originalBoard.IndexOf(str);
+            string newBoardWithinCS = originalBoard.Substring(0, index);
             DataTable tbl = new DataTable();
             SiplacePro.openConnection();
             SiplacePro.sql = "SELECT    TOP (100) PERCENT dbo.AliasName.ObjectName FROM dbo.CBoard " +
@@ -183,42 +186,49 @@ namespace Traceabilty_Flex
         }
         private void checkSideValidation(string board, string pallet, string line)
         {
-            if (isBoardDubleSided(board))
+            if (!MainWindow.isBoardException(board))
             {
                 if (board.Contains("cs"))
                 {
-                    DataTable palletInTraceDB = new DataTable();
-                    traceDB.openConnection();
-                    traceDB.sql = "SELECT DISTINCT TOP(100) PERCENT dbo.PCBBarcode.Barcode AS PCBBarcode, SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe " +
-                              "FROM dbo.PCBBarcode FULL OUTER JOIN dbo.Setup INNER JOIN dbo.Recipe INNER JOIN dbo.Job INNER JOIN " +
-                               "dbo.TraceData INNER JOIN dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId " +
-                               "ON dbo.Recipe.id = dbo.Job.RecipeId INNER JOIN dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id " +
-                               "ON dbo.Setup.id = dbo.Job.SetupId INNER JOIN dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id " +
-                               "ON dbo.PCBBarcode.Id = dbo.TraceData.PCBBarcodeId " +
-                              "WHERE(dbo.PCBBarcode.Barcode = N'" + pallet + "') AND(SUBSTRING(dbo.Station.Name, 15, LEN(dbo.Station.Name)) LIKE 'Sipl%') ";
-
-                    traceDB.cmd.CommandText = traceDB.sql;
-                    traceDB.rd = traceDB.cmd.ExecuteReader();
-                    palletInTraceDB.Load(traceDB.rd);
-                    if (palletInTraceDB.Rows.Count == 0)
+                    if (isBoardDubleSided(board))
                     {
-                        _mainForm.ErrorOut("Assembly ps side not found on board :  " + pallet+" => " + line);
-                        _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly ps side not found on board:  " + pallet + " => " + line, true, "", "", board);
+                        DataTable palletInTraceDB = new DataTable();
+                        traceDB.openConnection();
+                        traceDB.sql = "SELECT DISTINCT TOP(100) PERCENT dbo.PCBBarcode.Barcode AS PCBBarcode, SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe " +
+                                  "FROM dbo.PCBBarcode FULL OUTER JOIN dbo.Setup INNER JOIN dbo.Recipe INNER JOIN dbo.Job INNER JOIN " +
+                                   "dbo.TraceData INNER JOIN dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId " +
+                                   "ON dbo.Recipe.id = dbo.Job.RecipeId INNER JOIN dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id " +
+                                   "ON dbo.Setup.id = dbo.Job.SetupId INNER JOIN dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id " +
+                                   "ON dbo.PCBBarcode.Id = dbo.TraceData.PCBBarcodeId " +
+                                  "WHERE(dbo.PCBBarcode.Barcode = N'" + pallet + "') AND(SUBSTRING(dbo.Station.Name, 15, LEN(dbo.Station.Name)) LIKE 'Sipl%') ";
 
-                    }
-                    if (palletInTraceDB.Rows.Count > 0)
-                    {
-
-                        if ((!isPsExists(palletInTraceDB)) && (!isPalletIxistsInSideValidationDb(pallet)))
+                        traceDB.cmd.CommandText = traceDB.sql;
+                        traceDB.rd = traceDB.cmd.ExecuteReader();
+                        palletInTraceDB.Load(traceDB.rd);
+                        if (palletInTraceDB.Rows.Count == 0)
                         {
-                            _mainForm.ErrorOut("Assembly ps side not found on board:  " + pallet + " => " + line);
+                            _mainForm.ErrorOut("Assembly ps side not found on board :  " + pallet + " => " + line);
                             _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly ps side not found on board:  " + pallet + " => " + line, true, "", "", board);
 
                         }
+                        if (palletInTraceDB.Rows.Count > 0)
+                        {
+
+                            if ((!isPsExists(palletInTraceDB)) && (!isPalletIxistsInSideValidationDb(pallet)))
+                            {
+                                _mainForm.ErrorOut("Assembly ps side not found on board:  " + pallet + " => " + line);
+                                _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly ps side not found on board:  " + pallet + " => " + line, true, "", "", board);
+
+                            }
+                        }
+
                     }
+
 
                 }
             }
+
+
 
 
         }
@@ -249,7 +259,7 @@ namespace Traceabilty_Flex
                     command.Parameters.AddWithValue("@plt", pallet);
                     connection.Open();
                     int result = (int)command.ExecuteScalar();
-                    if(result == 0)
+                    if (result == 0)
                     {
                         return false;
                     }
@@ -260,7 +270,7 @@ namespace Traceabilty_Flex
 
                 }
             }
-                
+
         }
 
         private string GetLineSide(string line, string Convayer)

@@ -11,6 +11,7 @@ namespace Traceabilty_Flex
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static string[] ProgrammExceptionList;
 
         private void GetSettings()
         {
@@ -28,6 +29,9 @@ namespace Traceabilty_Flex
 
             var d5 = GetRecipeList();
             DataGridRecipes.ItemsSource = d5.AsDataView();
+
+            var d6 = GetProgrammList();
+            DataGridProgramm.ItemsSource = d6.AsDataView();
         }
 
         private DataTable GetCustomers()
@@ -75,6 +79,21 @@ namespace Traceabilty_Flex
                 reclist[i] = dt.Rows[i][0].ToString().Trim();
             }
             RecipeExceptionList = reclist;
+
+            return dt;
+        }
+        private DataTable GetProgrammList()
+        {
+            var sql = new SqlClass("trace");
+            string query = @"SELECT TOP (1000) [Programm] FROM [Traceability].[dbo].[ProgrammsExeption]";
+            DataTable dt = new DataTable();
+            dt = sql.SelectDb(query, out string result);
+            var proglist = new string[dt.Rows.Count];
+            for (var i = 0; i < dt.Rows.Count; i++)
+            {
+                proglist[i] = dt.Rows[i][0].ToString().Trim();
+            }
+            ProgrammExceptionList = proglist;
 
             return dt;
         }
@@ -127,6 +146,14 @@ namespace Traceabilty_Flex
         private void CheckboxRecipes_Unchecked(object sender, RoutedEventArgs e)
         {
             DataGridRecipes.IsReadOnly = true;
+        }
+        private void CheckboxProgramms_Checked(object sender, RoutedEventArgs e)
+        {
+            DataGridProgramm.IsReadOnly = false;
+        }
+        private void CheckboxProgramms_Unchecked(object sender, RoutedEventArgs e)
+        {
+            DataGridProgramm.IsReadOnly = true;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -275,6 +302,34 @@ namespace Traceabilty_Flex
                     }
                 }
                 GetRecipeList();
+            }
+            if(CheckboxProgramms.IsChecked != null && (bool)CheckboxProgramms.IsChecked)
+            {
+                var dt = new DataTable();
+                dt = ((DataView)DataGridProgramm.ItemsSource).ToTable();
+
+                var q = @"SELECT * FROM ProgrammsExeption";
+                var du = sql.SelectDb(q, out var res);
+                if (dt.Rows.Count != du.Rows.Count)
+                {
+                    q = "truncate table ProgrammsExeption";
+                    sql.Update(q);
+                    foreach (DataRow item in dt.Rows)
+                    {
+                        var query = string.Format(@"IF NOT EXISTS(SELECT 1 from ProgrammsExeption where Programm = '{0}') Insert INTO ProgrammsExeption
+                                    (Programm) VALUES('{0}')", item["Programm"]);
+                        try
+                        {
+                            sql.Update(query);
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorOut("At CustomerSettingsSaving" + ex.Message);
+                        }
+                    }
+                    GetProgrammList();
+                }
+
             }
         }
 

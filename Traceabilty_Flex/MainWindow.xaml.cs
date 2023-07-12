@@ -293,7 +293,11 @@ namespace Traceabilty_Flex
                 ErrorOut("At GetStatusLines: " + ex.Message);
             }
         }
-
+        public static bool isBoardException(string board)
+        {
+            bool isExist = ProgrammExceptionList.Contains(board);
+            return isExist;
+        }
         private bool RegisterLineStatus(string line, string client, string recipe)
         {
             if (RecipeExceptionList != null)
@@ -1267,5 +1271,9 @@ namespace Traceabilty_Flex
                 }
             }
         }
+
+       
+
+       
     }
 }

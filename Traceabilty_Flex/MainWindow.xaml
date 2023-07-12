@@ -408,17 +408,19 @@
                 </TabItem.Header>
                 <Grid Background="{DynamicResource Bg1}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="4*"/>
-                        <RowDefinition Height="4*"/>
+                        <RowDefinition Height="3*"/>
                         <RowDefinition Height="3*"/>
                         <RowDefinition Height="4*"/>
+                        <RowDefinition Height="3*"/>
                         <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="1*"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <GroupBox Header="Lines Configuration" FontSize="16" FontStyle="Italic" Margin="10,10,10,5" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Grid.RowSpan="2">
+                    <GroupBox Header="Lines Configuration" FontSize="16" FontStyle="Italic" Margin="10,10,10,5" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
                                 <TextBlock Text="Delay (in sec):" FontSize="12" FontStyle="Normal" VerticalAlignment="Center"/>
@@ -439,12 +441,12 @@
                             <DataGrid x:Name="DataGridLineConfig" Padding="0" HorizontalContentAlignment="Stretch" IsReadOnly="True" VerticalContentAlignment="Stretch" Margin="10,5,10,10" FontSize="12" FontStyle="Normal" MinColumnWidth="80" MaxHeight="350"/>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Header="Users" FontSize="16" FontStyle="Italic" Margin="10,0,10,10" Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Grid.RowSpan="3" >
+                    <GroupBox Header="Users" FontSize="16" FontStyle="Italic" Margin="10,0,10,0" Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="1" >
                         <StackPanel >
                             <DataGrid x:Name="DataGridUsers" Padding="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True" Margin="10" FontSize="12" FontStyle="Normal" MinColumnWidth="80" MaxHeight="350"/>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Header="Parts Exception" FontSize="16" FontStyle="Italic" Margin="5,10,10,5" Grid.Column="1" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
+                    <GroupBox Header="Parts Exception" FontSize="16" FontStyle="Italic" Margin="5,10,10,5" Grid.Column="3" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" >
                             <DataGrid x:Name="DataGridParts" ItemsSource="{Binding DataSource}" AutoGenerateColumns="False" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" Margin="10,15,10,10" HorizontalAlignment="Center" FontSize="12" FontStyle="Normal" MinColumnWidth="200" MaxHeight="135" VerticalAlignment="Center">
                                 <DataGrid.Columns>
@@ -459,7 +461,7 @@
                             </DataGrid>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Grid.Row="1" Grid.Column="1" Header="Customers" Margin="5,5,10,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="16" FontStyle="Italic" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
+                    <GroupBox Grid.Row="1" Grid.Column="3" Header="Customers" Margin="5,5,10,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="16" FontStyle="Italic" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
                             <DataGrid x:Name="DataGridCustomers" ItemsSource="{Binding DataSource}" AutoGenerateColumns="False" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" Margin="10,15,10,10" HorizontalAlignment="Center" FontSize="12" FontStyle="Normal" MinColumnWidth="200" MaxHeight="140" VerticalAlignment="Center">
                                 <DataGrid.Columns>
@@ -474,18 +476,19 @@
                             </DataGrid>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Grid.Row="2" Grid.Column="1" Header="Update" Margin="5,0,10,0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="16" FontStyle="Italic" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
+                    <GroupBox Grid.Row="2" Grid.Column="3" Header="Update" Margin="5,0,10,0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="16" FontStyle="Italic" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5">
                             <CheckBox x:Name="CheckboxLines" Content="Line Configuration" FontSize="12" FontStyle="Normal" Margin="0,15,0,5" VerticalContentAlignment="Center" VerticalAlignment="Center" Checked="CheckboxLines_Checked" Unchecked="CheckboxLines_Unchecked"/>
                             <CheckBox x:Name="CheckboxUsers" Margin="0,0,0,5" Content="Users" FontStyle="Normal" VerticalContentAlignment="Center" VerticalAlignment="Center" FontSize="12" Unchecked="CheckboxUsers_Unchecked" Checked="CheckboxUsers_Checked"/>
                             <CheckBox x:Name="CheckboxParts" FontStyle="Normal" Content="Part Exception" Padding="4,-1,0,0" VerticalContentAlignment="Center" VerticalAlignment="Center" FontSize="12" Checked="CheckboxParts_Checked" Unchecked="CheckboxParts_Unchecked" Margin="0,0,0,5"/>
                             <CheckBox x:Name="CheckboxCustomers" Margin="0,0,0,5" FontStyle="Normal" Content="Customers" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="12" Checked="CheckboxCustomers_Checked" Unchecked="CheckboxCustomers_Unchecked"/>
                             <CheckBox x:Name="CheckboxRecipes" Margin="0,0,0,5" FontStyle="Normal" Content="Recipes" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="12" Checked="CheckboxRecipes_Checked" Unchecked="CheckboxRecipes_Unchecked"/>
+                            <CheckBox x:Name="CheckboxProgramms" Margin="0,0,0,5" FontStyle="Normal" Content="Programms" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="12" Checked="CheckboxProgramms_Checked" Unchecked="CheckboxProgramms_Unchecked" />
 
                             <TextBlock x:Name="TextUpdated" FontSize="14" FontStyle="Normal" Margin="0,10,0,0"/>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Grid.Row="3" Grid.Column="1" Header="Recipes" Margin="5,5,10,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="16" FontStyle="Italic" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
+                    <GroupBox Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Header="Recipes" Margin="5,0,10,0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="16" FontStyle="Italic" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
                             <DataGrid x:Name="DataGridRecipes" ItemsSource="{Binding DataSource}" AutoGenerateColumns="False" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" Margin="10,15,10,10" HorizontalAlignment="Center" FontSize="12" FontStyle="Normal" MinColumnWidth="200" MaxHeight="140" VerticalAlignment="Center">
                                 <DataGrid.Columns>
@@ -494,6 +497,18 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
+                    </GroupBox>
+                    <GroupBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Header="Programms without PS" Margin="5,5,5,5" FontSize="16" FontStyle="Italic" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" >
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <DataGrid x:Name="DataGridProgramm" ItemsSource="{Binding DataSourse}" AutoGenerateColumns="False" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" Margin="10,15,10,10" HorizontalAlignment="Center" FontSize="12" FontStyle="Normal" MinColumnWidth="200" MaxHeight="140" VerticalAlignment="Center">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Programm" Binding="{Binding Programm}" Width="200">
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            
+                        </StackPanel>
+                        
                     </GroupBox>
 
                     <StackPanel Orientation="Horizontal" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Grid.Column="1">

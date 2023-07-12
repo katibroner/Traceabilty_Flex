@@ -61,6 +61,7 @@ namespace Traceabilty_Flex
         internal static string[] PartsException;
         internal static string[] CustomerList;
         internal static string[] RecipeExceptionList;
+        //internal static string[] ProgrammExceptionList;
 
         internal static Button[] _buttons = null;
         internal static List<FlexLine> LineCollection = new List<FlexLine>();
