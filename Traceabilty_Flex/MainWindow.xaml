@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"       
-        Title="Traceability" Width="1200"  MinWidth="1200" Closed="Window_Closed" WindowStartupLocation="CenterScreen" SizeToContent="Height" MinHeight="1000" MaxHeight="1000" MaxWidth="1500" Icon="/Images/logo.ico">
+        Title="Traceability" Closed="Window_Closed" WindowStartupLocation="CenterScreen"  Height="1100" Width="1200" Icon="/Images/logo.ico" Closing="Window_Closing">
     <Window.Resources>
         <ImageBrush x:Key="Button0" ImageSource="Images/siemens.jpg" ViewportUnits="Absolute" Viewport="0,0,150,150" Stretch="UniformToFill" />
         <ImageBrush x:Key="Bg" ImageSource="Images/bg5.jpg" TileMode="Tile" Stretch="None" ViewportUnits="Absolute" Viewport="0,0,550,250" />
@@ -103,14 +103,14 @@
     </Window.Resources>
 
     <Grid>
-        <StackPanel Orientation="Horizontal" Margin="10,2,0,2" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2" Width="1172">
+        <StackPanel Orientation="Horizontal" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2" Width="1172">
             <Button x:Name="ButStart" Content="" ToolTip="Start" Click="ButStart_Click" VerticalContentAlignment="Stretch" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Width="45" Height="45" Background="{DynamicResource ButtonStart}" Margin="0" BorderThickness="0" Visibility="Collapsed"/>
-            <Button x:Name="ButClean" Content="" ToolTip="Clean" VerticalContentAlignment="Stretch" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Width="45" Height="45" Background="{DynamicResource ButtonClean}" Margin="20,0,0,0" BorderThickness="0" Click="ButClean_Click"/>
-            <Button x:Name="ButtonLogin" Content="" Width="200" Margin="380,0,0,0" HorizontalAlignment="Left" FlowDirection="LeftToRight" Click="Button_Login_Click" Padding="2,0" FontSize="14" Background="{DynamicResource ButtonLogin2}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <Button x:Name="ButClean" Content="" ToolTip="Clean" VerticalContentAlignment="Stretch" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Width="45" Height="45" Background="{DynamicResource ButtonClean}" Margin="20,0,0,0" BorderThickness="0" Click="ButClean_Click" Visibility="Hidden"/>
+            <Button x:Name="ButtonLogin" Content="" Width="200" Margin="380,0,0,0" HorizontalAlignment="Left" FlowDirection="LeftToRight" Click="Button_Login_Click" Padding="2,0" FontSize="14" Background="{DynamicResource ButtonLogin2}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Visibility="Hidden"/>
             <Button x:Name="ButStop" Content="" ToolTip="Exit" VerticalContentAlignment="Stretch" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Width="45" Height="45" Background="{DynamicResource ButtonStop}" Margin="480,0,0,0" BorderThickness="0" Click="ButStop_Click" DockPanel.Dock="Right"/>
         </StackPanel>
 
-        <TabControl x:Name="MainTabControl" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"  SelectionChanged="MainTabControl_SelectionChanged" Margin="0,15,0,0" Grid.RowSpan="3" Background="{x:Null}">
+        <TabControl x:Name="MainTabControl" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"  SelectionChanged="MainTabControl_SelectionChanged" Margin="0,15,0,0" Grid.RowSpan="4" Background="{x:Null}">
             <TabItem x:Name="TabOverview" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" >
@@ -121,13 +121,20 @@
                 </TabItem.Header>
                 <Grid Background="{DynamicResource Bg}" >
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="141*"/>
-                        <ColumnDefinition Width="209*"/>
+                        <ColumnDefinition Width="30*"/>
+                        <ColumnDefinition Width="18*"/>
+                        <ColumnDefinition Width="94*"/>
+                        <ColumnDefinition Width="158*"/>
+                        <ColumnDefinition Width="52*"/>
                         <ColumnDefinition Width="41*"/>
                         <ColumnDefinition Width="80*"/>
-                        <ColumnDefinition Width="595*"/>
+                        <ColumnDefinition Width="11*"/>
+                        <ColumnDefinition Width="116*"/>
+                        <ColumnDefinition Width="22*"/>
+                        <ColumnDefinition Width="18*"/>
+                        <ColumnDefinition Width="432*"/>
                     </Grid.ColumnDefinitions>
-                    <ListBox x:Name="LstMsgBox" VerticalContentAlignment="Center" Background="White" HorizontalAlignment="Center" MinWidth="600" Margin="92,20,233,20" Grid.Column="1" Grid.ColumnSpan="4">
+                    <ListBox x:Name="LstMsgBox" VerticalContentAlignment="Center" Background="White" HorizontalAlignment="Left" MinWidth="600" Margin="94,20,0,20" Grid.Column="3" Grid.ColumnSpan="9">
                         <ListBox.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Clear" Click="MenuItem_Click_1" />
@@ -409,7 +416,7 @@
                 <Grid Background="{DynamicResource Bg1}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="3*"/>
-                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="4*"/>
                         <RowDefinition Height="4*"/>
                         <RowDefinition Height="3*"/>
                         <RowDefinition Height="1*"/>
@@ -438,7 +445,7 @@
                                     <ComboBoxItem Content="360"/>
                                 </ComboBox>
                             </StackPanel>
-                            <DataGrid x:Name="DataGridLineConfig" Padding="0" HorizontalContentAlignment="Stretch" IsReadOnly="True" VerticalContentAlignment="Stretch" Margin="10,5,10,10" FontSize="12" FontStyle="Normal" MinColumnWidth="80" MaxHeight="350"/>
+                            <DataGrid x:Name="DataGridLineConfig" Padding="0" HorizontalContentAlignment="Stretch" IsReadOnly="False" VerticalContentAlignment="Stretch" Margin="10,5,10,10" FontSize="12" FontStyle="Normal" MinColumnWidth="80" MaxHeight="320"/>
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Header="Users" FontSize="16" FontStyle="Italic" Margin="10,0,10,0" Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="1" >
@@ -490,7 +497,7 @@
                     </GroupBox>
                     <GroupBox Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Header="Recipes" Margin="5,0,10,0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="16" FontStyle="Italic" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
-                            <DataGrid x:Name="DataGridRecipes" ItemsSource="{Binding DataSource}" AutoGenerateColumns="False" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" Margin="10,15,10,10" HorizontalAlignment="Center" FontSize="12" FontStyle="Normal" MinColumnWidth="200" MaxHeight="140" VerticalAlignment="Center">
+                            <DataGrid x:Name="DataGridRecipes" ItemsSource="{Binding DataSource}" AutoGenerateColumns="False" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" Margin="10,15,10,10" HorizontalAlignment="Center" FontSize="12" FontStyle="Normal" MinColumnWidth="200" MaxHeight="120" VerticalAlignment="Center">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Recipe" Binding="{Binding recipe}" Width="200">
                                     </DataGridTextColumn>
@@ -498,17 +505,17 @@
                             </DataGrid>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Header="Programms without PS" Margin="5,5,5,5" FontSize="16" FontStyle="Italic" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" >
+                    <GroupBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Header="Programs without PS" Margin="5,5,5,5" FontSize="16" FontStyle="Italic" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" >
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <DataGrid x:Name="DataGridProgramm" ItemsSource="{Binding DataSourse}" AutoGenerateColumns="False" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" Margin="10,15,10,10" HorizontalAlignment="Center" FontSize="12" FontStyle="Normal" MinColumnWidth="200" MaxHeight="140" VerticalAlignment="Center">
+                            <DataGrid x:Name="DataGridProgramm" ItemsSource="{Binding DataSourse}" AutoGenerateColumns="False" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" Margin="10,15,10,10" HorizontalAlignment="Center" FontSize="12" FontStyle="Normal" MinColumnWidth="200" MaxHeight="120" VerticalAlignment="Center">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Programm" Binding="{Binding Programm}" Width="200">
+                                    <DataGridTextColumn Header="Program" Binding="{Binding Programm}" Width="200">
                                     </DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
-                            
+
                         </StackPanel>
-                        
+
                     </GroupBox>
 
                     <StackPanel Orientation="Horizontal" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Grid.Column="1">
@@ -518,7 +525,7 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <StatusBar Grid.Row="5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.ColumnSpan="2" Background="{DynamicResource Bg}">
+        <StatusBar Grid.Row="5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.ColumnSpan="2" Background="{DynamicResource Bg}" Margin="0,596,0,0" Grid.RowSpan="2">
             <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0">
                 <Label x:Name="LabelTraceability" Background="Red" Width="20" Height="20" Margin="5,0" ToolTip="Traceability Service"/>
                 <Label x:Name="LabelRecipeDownload" Background="Red" Width="20" Height="20" Margin="5,0" ToolTip="Monitoring Service"/>
@@ -527,7 +534,7 @@
             </StackPanel>
             <ProgressBar x:Name="Progress" Width="200" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,-1,0,0"/>
         </StatusBar>
-        <Border x:Name="BorderLine" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Grid.RowSpan="3" Margin="29,38,29,10" Height="831" Width="62">
+        <Border x:Name="BorderLine" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="3" Grid.Column="1" Grid.RowSpan="3" Margin="0,24,0,0" Height="831" Width="62">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical" Margin="9" Height="811" Width="42">
                 <Button x:Name="ButtonA" Width="35" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{x:Null}" Content="A" FontSize="24" Margin="0" Click="ButtonA_Click" Padding="0"/>
                 <Button x:Name="ButtonB" Width="35" Height="32"  HorizontalAlignment="Center" VerticalAlignment="Center" Background="{x:Null}" Content="B" FontSize="24" Margin="0,5,0,0" Click="ButtonB_Click"/>
@@ -556,9 +563,10 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition Height="3*"/>
+            <RowDefinition Height="72*"/>
+            <RowDefinition Height="127*"/>
+            <RowDefinition Height="199*"/>
+            <RowDefinition Height="596*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>

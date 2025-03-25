@@ -17,9 +17,14 @@ namespace Traceabilty_Flex
     public partial class MainWindow : Window
     {
         public static MainWindow mn;
+        private DispatcherTimer _settingsRefreshTimer;
         public MainWindow()
         {
             InitializeComponent();
+            _settingsRefreshTimer = new DispatcherTimer();
+            _settingsRefreshTimer.Interval = TimeSpan.FromMinutes(1); // One minute interval
+            _settingsRefreshTimer.Tick += SettingsRefreshTimer_Tick;
+            _settingsRefreshTimer.Start();
 
             GridLines.ItemsSource = DTRecipes.AsDataView();
 
@@ -54,6 +59,11 @@ namespace Traceabilty_Flex
 
             monitorWorker.RunWorkerAsync();
             recipeWorker.RunWorkerAsync();
+        }
+
+        private void SettingsRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            GetSettings();
         }
 
         private void Shrink_DB_Log_Tick(object sender, EventArgs e)
@@ -293,10 +303,9 @@ namespace Traceabilty_Flex
                 ErrorOut("At GetStatusLines: " + ex.Message);
             }
         }
-        public static bool isBoardException(string board)
+        public static bool isBoardException(string boardToCheck)
         {
-            bool isExist = ProgrammExceptionList.Contains(board);
-            return isExist;
+            return ProgrammExceptionList.Any(word => boardToCheck.Contains(word));
         }
         private bool RegisterLineStatus(string line, string client, string recipe)
         {
@@ -542,6 +551,7 @@ namespace Traceabilty_Flex
 
         private void CheckPallets()
         {
+            
             for (var i = 0; i < LineList.Count; i++)
             {
                 var sql = new SqlClass("trace");
@@ -640,14 +650,37 @@ namespace Traceabilty_Flex
 
         private void ButStop_Click(object sender, RoutedEventArgs e)
         {
-            UnsubscribeTraceability();
-
-            if (Level == 4 && _mainservice)
+            
+            PasswordDialog passwordDialog = new PasswordDialog();
+            if (passwordDialog.ShowDialog() == true)
             {
-                ClearTraceLines();
-            }
+                string enteredPassword = passwordDialog.Password;
 
-            Close();
+                
+                if (enteredPassword == "katibroner") 
+                {
+                    
+                    UnsubscribeTraceability();
+
+                    if (Level == 4 && _mainservice)
+                    {
+                        ClearTraceLines();
+                    }
+
+                    
+                    Close();
+                }
+                else
+                {
+                    MessageBox.Show("Incorrect password. The program continues to run.");
+                   
+                }
+            }
+            else
+            {
+                
+                MessageBox.Show("Closing cancelled.");
+            }
         }
 
         private void ButClean_Click(object sender, RoutedEventArgs e)
@@ -1272,8 +1305,24 @@ namespace Traceabilty_Flex
             }
         }
 
-       
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            PasswordDialog passwordDialog = new PasswordDialog();
+            if (passwordDialog.ShowDialog() == true)
+            {
+                string enteredPassword = passwordDialog.Password;
 
-       
+                // Check the password you entered
+                if (enteredPassword != "katibroner")
+                {
+                    MessageBox.Show("Incorrect password. Closing cancelled.");
+                    e.Cancel = true; // Cancel closure
+                }
+            }
+            else
+            {
+                e.Cancel = true; // Cancel close if window is closed without entering password
+            }
+        }
     }
 }

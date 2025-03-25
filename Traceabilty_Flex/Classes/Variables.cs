@@ -35,7 +35,7 @@ namespace Traceabilty_Flex
         public DispatcherTimer Shrink_DB_Log = new DispatcherTimer();//refresh every 1 hour.
 
         internal const string _patUnitID = @"\d{10}\/\d{4}"; //1234567891/1234
-        internal const string _patBatch = @"^\d{10}\z";//1234567891
+        internal const string _patBatch = @"^\D*(?:\d\D*){1,10}$";//1234567891
 
 
         private const string progName = "Traceability Line Control";
@@ -93,7 +93,7 @@ namespace Traceabilty_Flex
             {"Line-G", false },
             {"Line-H", false },
             {"Line-I", false },
-            {"Line-J", false },
+           /* {"Line-J", false },*/
             {"Line-K", false },
             {"Line-L", false },
             {"Line-M", false },
@@ -119,7 +119,7 @@ namespace Traceabilty_Flex
             {"Line-G", "" },
             {"Line-H", "" },
             {"Line-I", "" },
-            {"Line-J", "" },
+           /* {"Line-J", "" },*/
             {"Line-K", "" },
             {"Line-L", "" },
             {"Line-M", "" },
@@ -135,7 +135,7 @@ namespace Traceabilty_Flex
         };
 
         internal static List<string> LineList = new List<string>()
-            {"Line-A", "Line-B","Line-C", "Line-D", "Line-E", "Line-F", "Line-G", "Line-H", "Line-I","Line-J", "Line-K","Line-L", "Line-M", "Line-N", "Line-O","Line-P","Line-Q1","Line-Q2","Line-R1","Line-R2","Line-S1","Line-S2"};
+            {"Line-A", "Line-B","Line-C", "Line-D", "Line-E", "Line-F", "Line-G", "Line-H", "Line-I",/*"Line-J",*/ "Line-K","Line-L", "Line-M", "Line-N", "Line-O","Line-P","Line-Q1","Line-Q2","Line-R1","Line-R2","Line-S1","Line-S2"};
 
         private string[] _lines = new string[]
         {
@@ -148,7 +148,7 @@ namespace Traceabilty_Flex
             "System\\Line-G",
             "System\\Line-H",
             "System\\Line-I",
-            "System\\Line-J",
+            /*"System\\Line-J",*/
             "System\\Line-K",
             "System\\Line-L",
             "System\\Line-M",
@@ -171,7 +171,7 @@ namespace Traceabilty_Flex
             "net.tcp://smt-g:1406/Asm.As.Oib.SiplacePro.LineControl/reliable",
             "net.tcp://smt-h:1406/Asm.As.Oib.SiplacePro.LineControl/reliable",
             "net.tcp://smt-i:1406/Asm.As.Oib.SiplacePro.LineControl/reliable",
-            "net.tcp://smt-j:1406/Asm.As.Oib.SiplacePro.LineControl/reliable",
+            /*"net.tcp://smt-j:1406/Asm.As.Oib.SiplacePro.LineControl/reliable",*/
             "net.tcp://smt-k:1406/Asm.As.Oib.SiplacePro.LineControl/reliable",
             "net.tcp://smt-l:1406/Asm.As.Oib.SiplacePro.LineControl/reliable",
             "net.tcp://smt-m:1406/Asm.As.Oib.SiplacePro.LineControl/reliable",

@@ -85,7 +85,7 @@ namespace Traceabilty_Flex
         private DataTable GetProgrammList()
         {
             var sql = new SqlClass("trace");
-            string query = @"SELECT TOP (1000) [Programm] FROM [Traceability].[dbo].[ProgrammsExeption]";
+            string query = @"SELECT TOP (1000) [Programm] FROM [Traceability].[dbo].[ProgrammsException1]";
             DataTable dt = new DataTable();
             dt = sql.SelectDb(query, out string result);
             var proglist = new string[dt.Rows.Count];
@@ -308,15 +308,15 @@ namespace Traceabilty_Flex
                 var dt = new DataTable();
                 dt = ((DataView)DataGridProgramm.ItemsSource).ToTable();
 
-                var q = @"SELECT * FROM ProgrammsExeption";
+                var q = @"SELECT * FROM ProgrammsException1";
                 var du = sql.SelectDb(q, out var res);
                 if (dt.Rows.Count != du.Rows.Count)
                 {
-                    q = "truncate table ProgrammsExeption";
+                    q = "truncate table ProgrammsException1";
                     sql.Update(q);
                     foreach (DataRow item in dt.Rows)
                     {
-                        var query = string.Format(@"IF NOT EXISTS(SELECT 1 from ProgrammsExeption where Programm = '{0}') Insert INTO ProgrammsExeption
+                        var query = string.Format(@"IF NOT EXISTS(SELECT 1 from ProgrammsException1 where Programm = '{0}') Insert INTOProgrammsException1
                                     (Programm) VALUES('{0}')", item["Programm"]);
                         try
                         {

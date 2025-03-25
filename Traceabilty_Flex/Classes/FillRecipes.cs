@@ -201,7 +201,7 @@ namespace Traceabilty_Flex
                 else
                 {
                     query = string.Format(@"Insert INTO [Current] (line, receipe, tm, Boards, Finish_Boards, Change_Manual,wo) VALUES('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')",
-                                            line, board, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), 0, 0, 0, WO_LMS_DATA);
+                                            line, board, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), 100, 0, 0, WO_LMS_DATA);
                     sql.Insert(query);
                 }
             }

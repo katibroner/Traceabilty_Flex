@@ -26,7 +26,7 @@ namespace Traceabilty_Flex
             m_MessageCount = 0;
         }
 
-        internal void ErrorOut(string message)
+        internal  void ErrorOut(string message)
         {
             if (message == null || message == "") return;
 

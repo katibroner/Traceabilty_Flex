@@ -12,11 +12,40 @@ namespace Traceabilty_Flex
             LogWrite(logMessage, key);
         }
 
+        /* private void LogWrite(string logMessage, string key)
+         {
+             _mExePath = "c:\\tmp\\Traceability";
+
+             string logfile;
+             switch (key)
+             {
+                 case "error":
+                     logfile = "PartsListErrors.txt";
+                     break;
+                 case "RecipeEvents":
+                     logfile = "RecipeEvents.txt";
+                     break;
+                 default:
+                     logfile = "DebugLog.txt";
+                     break;
+             }
+             try
+             {
+                 using (StreamWriter w = File.AppendText(_mExePath + "\\" + logfile))
+                 {
+                     Log(logMessage, w);
+                 }
+             }
+             catch (Exception)
+             {
+                 // ignored
+             }
+         }*/
         private void LogWrite(string logMessage, string key)
         {
             _mExePath = "c:\\tmp\\Traceability";
 
-            string logfile;
+            string logfile = null;
             switch (key)
             {
                 case "error":
@@ -25,20 +54,22 @@ namespace Traceabilty_Flex
                 case "RecipeEvents":
                     logfile = "RecipeEvents.txt";
                     break;
-                default:
-                    logfile = "DebugLog.txt";
-                    break;
+                   
             }
-            try
+
+            if (logfile != null)
             {
-                using (StreamWriter w = File.AppendText(_mExePath + "\\" + logfile))
+                try
                 {
-                    Log(logMessage, w);
+                    using (StreamWriter w = File.AppendText(_mExePath + "\\" + logfile))
+                    {
+                        Log(logMessage, w);
+                    }
                 }
-            }
-            catch (Exception)
-            {
-                // ignored
+                catch (Exception)
+                {
+                    // ignored
+                }
             }
         }
 
@@ -81,7 +112,7 @@ namespace Traceabilty_Flex
         public static void SendMail(string mailTo, string mailCC, string mailSubject, string mailBody)
         {
             mailTo = "sariel.goldvarg@flex.com";
-            mailCC = "yuri.migal@flex.com, igor.sydorenko@flex.com, miroslav.sidler@flex.com";
+            mailCC = "yuri.migal@flex.com, igor.sydorenko@flex.com, miroslav.sidler@flex.com, maxim.lihovich@flex.com,yakov.luski@flex.com, Helena.Dulgerov@flex.com, Artur.Minkovych@flex.com,tatiana.makartsev@flex.com, Michael.Shuster@flex.com ";
             try
             {
                 string MailSvc = "http://mignt100/Service/SendMail.ashx?";

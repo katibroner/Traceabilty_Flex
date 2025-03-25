@@ -52,6 +52,13 @@ namespace Traceabilty_Flex
                 _secret = "$Flex2016";
                 name = _dataBaseName = "TraceDB";
             }
+            else if (name == "setup_trace_new")
+            {
+                _serverName = "tcp:172.20.20.4";
+                _userName = "aoi";
+                _secret = "$Flex2016";
+                name = _dataBaseName = "ASMPTTraceabilityDb";
+            }
             else if (name == "trace")
             {
                 _serverName = "MIGSQLCLU4\\SMT";

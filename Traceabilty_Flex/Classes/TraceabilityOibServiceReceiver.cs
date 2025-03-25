@@ -87,9 +87,6 @@ namespace Traceabilty_Flex
                             if (line == "Line-R" || line == "Line-S" || line == "Line-Q")
                                 line = GetLineSide(line, Lane);
 
-                            if (line == "Line-C" || line == "Line-N" || line == "Line-G")
-                                line = line;
-
                             ShowActivity(trcData, line, station, pallet, recipe);
                             if (!MainWindow.StatusDictionary[line])
                                 return response;
@@ -113,12 +110,14 @@ namespace Traceabilty_Flex
                     }
                 }
                 checkSideValidation(board, pallet, line);
-                if (pallet.StartsWith("NO_PCB_BARCODE"))
+                CheckSideValidationByPlacement(board, pallet, line, boardSide);
+                if (pallet.StartsWith("NO_PCB_BARCODE"))//NO_PCB_BARCODE: 
                 {
                     if (_mainForm != null && _mainForm.CheckStation(line, station))
                     {
                         _mainForm.ErrorOut(line + ", " + station + ", " + "NO_PCB_BARCODE");
                         _mainForm.EmergencyStopMethod(line + " " + station, null, null, recipe, "NO_PCB_BARCODE", true, "", "", "");
+
                     }
                     return response;
                 }
@@ -158,7 +157,7 @@ namespace Traceabilty_Flex
             }
             return response;
         }
-       
+
         private static bool isBoardDubleSided(string board)
         {
             string originalBoard = board;
@@ -186,6 +185,7 @@ namespace Traceabilty_Flex
         }
         private void checkSideValidation(string board, string pallet, string line)
         {
+
             if (!MainWindow.isBoardException(board))
             {
                 if (board.Contains("cs"))
@@ -193,18 +193,27 @@ namespace Traceabilty_Flex
                     if (isBoardDubleSided(board))
                     {
                         DataTable palletInTraceDB = new DataTable();
-                        traceDB.openConnection();
-                        traceDB.sql = "SELECT DISTINCT TOP(100) PERCENT dbo.PCBBarcode.Barcode AS PCBBarcode, SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe " +
+                        ASMPTTraceabilityDb.openConnection();
+                        // AND (dbo.Board.Name LIKE N'%" + board + "')
+                        /*ASMPTTraceabilityDb.sql = "SELECT DISTINCT TOP(100) PERCENT dbo.PCBBarcode.Barcode AS PCBBarcode, SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe " +
                                   "FROM dbo.PCBBarcode FULL OUTER JOIN dbo.Setup INNER JOIN dbo.Recipe INNER JOIN dbo.Job INNER JOIN " +
                                    "dbo.TraceData INNER JOIN dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId " +
                                    "ON dbo.Recipe.id = dbo.Job.RecipeId INNER JOIN dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id " +
                                    "ON dbo.Setup.id = dbo.Job.SetupId INNER JOIN dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id " +
                                    "ON dbo.PCBBarcode.Id = dbo.TraceData.PCBBarcodeId " +
-                                  "WHERE(dbo.PCBBarcode.Barcode = N'" + pallet + "') AND(SUBSTRING(dbo.Station.Name, 15, LEN(dbo.Station.Name)) LIKE 'Sipl%') ";
+                                  "WHERE(dbo.PCBBarcode.Barcode = N'" + pallet + "') AND(SUBSTRING(dbo.Station.Name, 15, LEN(dbo.Station.Name)) LIKE 'Sipl%') ";*/
+                        string substr = "cs";
+                        int index = board.IndexOf(substr);
+                        string boardNew = board.Substring(0, index);
+                        ASMPTTraceabilityDb.sql = "SELECT DISTINCT TOP (100) PERCENT dbo.PCBBarcode.Barcode AS PCBBarcode, SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe," +
+                            " dbo.Board.Name AS Board FROM dbo.Board INNER JOIN  dbo.Setup INNER JOIN  dbo.Recipe INNER JOIN     dbo.Job INNER JOIN" +
+                            " dbo.TraceData INNER JOIN     dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId ON dbo.Recipe.id = dbo.Job.RecipeId INNER JOIN" +
+                            " dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id ON dbo.Setup.id = dbo.Job.SetupId INNER JOIN     dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id ON dbo.Board.id = dbo.Job.BoardId FULL OUTER JOIN" +
+                            " dbo.PCBBarcode ON dbo.TraceData.PCBBarcodeId = dbo.PCBBarcode.Id WHERE     (dbo.PCBBarcode.Barcode = N'" + pallet + "')  AND (dbo.Board.Name LIKE N'%" + boardNew + "%') "; //*AND (SUBSTRING(dbo.Station.Name, 15, LEN(dbo.Station.Name)) LIKE 'Sipl%')*//
 
-                        traceDB.cmd.CommandText = traceDB.sql;
-                        traceDB.rd = traceDB.cmd.ExecuteReader();
-                        palletInTraceDB.Load(traceDB.rd);
+                        ASMPTTraceabilityDb.cmd.CommandText = ASMPTTraceabilityDb.sql;
+                        ASMPTTraceabilityDb.rd = ASMPTTraceabilityDb.cmd.ExecuteReader();
+                        palletInTraceDB.Load(ASMPTTraceabilityDb.rd);
                         if (palletInTraceDB.Rows.Count == 0)
                         {
                             _mainForm.ErrorOut("Assembly ps side not found on board :  " + pallet + " => " + line);
@@ -217,7 +226,7 @@ namespace Traceabilty_Flex
                             if ((!isPsExists(palletInTraceDB)) && (!isPalletIxistsInSideValidationDb(pallet)))
                             {
                                 _mainForm.ErrorOut("Assembly ps side not found on board:  " + pallet + " => " + line);
-                                _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly ps side not found on board:  " + pallet + " => " + line, true, "", "", board);
+                                _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly ps side not found on board or Name of the board is wrong:  " + pallet + " => " + line, true, "", "", board);
 
                             }
                         }
@@ -227,10 +236,6 @@ namespace Traceabilty_Flex
 
                 }
             }
-
-
-
-
         }
 
         private static bool isPsExists(DataTable tbl)
@@ -238,7 +243,7 @@ namespace Traceabilty_Flex
             bool x = false;
             for (int i = 0; i < tbl.Rows.Count; i++)
             {
-                if (tbl.Rows[i][1].ToString().Contains("ps"))
+                if (tbl.Rows[i][2].ToString().Contains("ps"))
                 {
 
                     x = true;
@@ -272,6 +277,154 @@ namespace Traceabilty_Flex
             }
 
         }
+        /// <summary>
+        /// Validates the board side based on its placement.
+        /// If the board side is not "Bottom", it checks for pallet presence in the database.
+        /// </summary>
+        /// <param name="board">The board name</param>
+        /// <param name="pallet">The pallet barcode</param>
+        /// <param name="line">The production line name</param>
+        /// <param name="boardSide">The side of the board</param>
+        private void CheckSideValidationByPlacement(string board, string pallet, string line, string boardSide)
+        {
+            string errorMessage = $"Assembly bottom side not found on board -  {board}: {pallet} => {line}";
+            if (!MainWindow.isBoardException(board))
+            {
+                //Checks if a given board has at least two distinct placements based on its placement reference
+                if (CheckBoardSideByPlacement(board))
+                {
+                    // Check if boardSide contains the word "Bottom" (case-insensitive)
+                    if (!(boardSide.IndexOf("Bottom", StringComparison.OrdinalIgnoreCase) >= 0))
+                    {
+                        // Retrieve data from the database
+                        DataTable palletInTraceDB = GetPalletData(board, pallet);
+
+                        // Check if there are records
+                        if (palletInTraceDB.Rows.Count < 2)
+                        {
+                            LogErrorAndStop(line, pallet, board, errorMessage);
+                        }
+                    }
+                }
+            }
+
+
+
+        }
+        /// <summary>
+        /// Checks if a given board has at least two distinct placements based on its placement reference.
+        /// </summary>
+        /// <param name="boardName">The name of the board to check.</param>
+        /// <returns>Returns true if the board has at least two distinct placements; otherwise, returns false.</returns>
+        private static bool CheckBoardSideByPlacement(string boardName)
+        {
+            try
+            {
+                // Open connection to the database
+                SiplacePro.openConnection();
+
+                // SQL query to check the count of distinct placements for a given board
+                string sql = @"SELECT COUNT(*) FROM (SELECT DISTINCT dbo.AliasName.ObjectName,  dbo.CBoardSide.bstrName, 
+            COALESCE(dbo.CPanel.spPlacementListRef, dbo.CPlacementList.OID) AS PlacementListRef
+        FROM dbo.CBoard 
+        INNER JOIN dbo.AliasName ON dbo.CBoard.OID = dbo.AliasName.PID 
+        INNER JOIN dbo.CBoardSide ON dbo.CBoard.OID = dbo.CBoardSide.PID 
+        LEFT JOIN dbo.CPanelMatrix ON dbo.CBoardSide.OID = dbo.CPanelMatrix.PID 
+        LEFT JOIN dbo.CPanel ON dbo.CPanelMatrix.OID = dbo.CPanel.PID 
+        LEFT JOIN dbo.CPlacementList ON dbo.CBoardSide.spPlacementListRef = dbo.CPlacementList.OID
+        WHERE dbo.AliasName.ObjectName = @BoardName
+        AND COALESCE(dbo.CPanel.spPlacementListRef, dbo.CPlacementList.OID) IS NOT NULL) AS SubQuery";
+
+                // Create SQL command with parameterized query to prevent SQL injection
+                using (SqlCommand cmd = new SqlCommand(sql, SiplacePro.con))
+                {
+                    // Bind the board name parameter to the SQL query
+                    cmd.Parameters.AddWithValue("@BoardName", boardName);
+
+                    // Execute the query and retrieve the count of distinct placements
+                    int count = (int)cmd.ExecuteScalar();
+
+
+                    // Return true if there are at least 2 placements; otherwise, return false
+                    return count == 2;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error message in case of an exception
+
+                return false;
+            }
+            finally
+            {
+                // Ensure the database connection is closed in any case
+                SiplacePro.closeConnection();
+            }
+        }
+        /// <summary>
+        /// Executes a database query and retrieves pallet and board data.
+        /// </summary>
+        /// <param name="board">The board name</param>
+        /// <param name="pallet">The pallet barcode</param>
+        /// <returns>A <see cref="DataTable"/> containing the query results</returns>
+        private static DataTable GetPalletData(string board, string pallet)
+        {
+            DataTable resultTable = new DataTable();
+
+            string query = @"SELECT DISTINCT TOP (100) PERCENT 
+                            dbo.PCBBarcode.Barcode AS PCBBarcode, 
+                            SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe, dbo.Job.BoardSide,
+                            dbo.Board.Name AS Board 
+                         FROM dbo.Board 
+                         INNER JOIN dbo.Setup 
+                         INNER JOIN dbo.Recipe 
+                         INNER JOIN dbo.Job 
+                         INNER JOIN dbo.TraceData 
+                         INNER JOIN dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId 
+                         ON dbo.Job.Id = dbo.TraceJob.JobId 
+                         ON dbo.Recipe.id = dbo.Job.RecipeId 
+                         INNER JOIN dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id 
+                         ON dbo.Setup.id = dbo.Job.SetupId 
+                         INNER JOIN dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id 
+                         ON dbo.Board.id = dbo.Job.BoardId 
+                         FULL OUTER JOIN dbo.PCBBarcode ON dbo.TraceData.PCBBarcodeId = dbo.PCBBarcode.Id 
+                         WHERE dbo.PCBBarcode.Barcode = @pallet 
+                         AND dbo.Board.Name LIKE @board";
+
+            using (SqlConnection connection = new SqlConnection(ASMPTTraceabilityDb.GetConnectionString()))
+            {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    // Add parameters to prevent SQL injection
+                    command.Parameters.AddWithValue("@pallet", pallet);
+                    command.Parameters.AddWithValue("@board", "%" + board + "%");
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(resultTable);
+                    }
+                }
+            }
+
+            return resultTable;
+        }
+        /// <summary>
+        /// Logs an error message and triggers an emergency stop.
+        /// </summary>
+        /// <param name="line">The production line name</param>
+        /// <param name="pallet">The pallet barcode</param>
+        /// <param name="board">The board name</param>
+        private void LogErrorAndStop(string line, string pallet, string board, string errorMessage)
+        {
+
+
+            // Log the error
+            _mainForm.ErrorOut(errorMessage);
+
+            // Perform an emergency stop
+            _mainForm.EmergencyStopMethod(line, null, null, " ", errorMessage, true, "", "", board);
+        }
 
         private string GetLineSide(string line, string Convayer)
         {
@@ -289,7 +442,7 @@ namespace Traceabilty_Flex
                 else if (Convayer == "Left")
                     return "Line-S2";
             }
-            if (line.Contains("Line-Q"))// Line S Convayer
+            if (line.Contains("Line-Q"))// Line Q Convayer
             {
                 if (Convayer == "Right")
                     return "Line-Q1";
@@ -463,7 +616,7 @@ namespace Traceabilty_Flex
                 barInvoker.DoWork += delegate
                 {
                     //Thread.Sleep(TimeSpan.FromSeconds(delay));
-                    Thread.Sleep(TimeSpan.FromSeconds(360));
+                    Thread.Sleep(TimeSpan.FromSeconds(480));
 
                     var task = Task.Run(() => CompareResults(line, pallet, board, setup, b, recipe, true, delay, Lane, boardSide));
                 };
@@ -475,55 +628,109 @@ namespace Traceabilty_Flex
             }
         }
 
-        private bool LastChance(string pallet, string recipe, string board, string line, DataTable d1, bool StartdelayFlag, out DataTable d2, out DataTable dDiff)
+        private bool LastChance(string pallet, string recipe, string board, string line, DataTable d1, bool StartdelayFlag, out DataTable d2, out DataTable dDiff)// use for switch to new  trace_db in SQLCLass.cs
         {
-            var sql = new SqlClass("setup_trace");
-
-            var query = string.Format(@"SELECT TOP (100) PERCENT dbo.PackagingUnit.ComponentBarcode AS PN, dbo.RefDesignator.Name AS RefDes, dbo.PackagingUnit.PackagingUniqueId AS PUID, 
-					                   '0' as Stam1,'0' as Stam2, '0' as Stam3
-                                        FROM dbo.Placement INNER JOIN
-					                    dbo.TracePlacement ON dbo.Placement.PlacementGroupId = dbo.TracePlacement.PlacementGroupId FULL OUTER JOIN
-					                    dbo.Recipe INNER JOIN
-					                    dbo.Job INNER JOIN
-					                    dbo.TraceData INNER JOIN
-					                    dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId ON dbo.Recipe.id = dbo.Job.RecipeId FULL OUTER JOIN
-					                    dbo.PCBBarcode ON dbo.TraceData.PCBBarcodeId = dbo.PCBBarcode.Id ON dbo.TracePlacement.TraceDataId = dbo.TraceData.Id FULL OUTER JOIN
-					                    dbo.RefDesignator ON dbo.Placement.RefDesignatorId = dbo.RefDesignator.Id FULL OUTER JOIN
-					                    dbo.Charge ON dbo.Placement.ChargeId = dbo.Charge.Id FULL OUTER JOIN
-					                    dbo.PackagingUnit ON dbo.Charge.PackagingUnitId = dbo.PackagingUnit.Id
-                                        WHERE (dbo.PCBBarcode.Barcode = N'{0}') and (dbo.Recipe.Name like N'%{1}')", pallet, recipe);
-
-            d2 = sql.SelectDb(query, out var Result);
-            if (Result != null)
-                _mainForm.ErrorOut(Result);
-
-            dDiff = null;
-
-            if (d2.Rows.Count == 0 || d1.Rows.Count == 0)
-                return false;
-
-            var thisLock = new Object();
-            lock (thisLock)
+            if (line == "Line-A" || line == "Line-E" || line == "Line-L" || line == "Line-N" || line == "Line-O" || line == "Line-C" || line == "Line-B" || line == "Line-K" || line == "Line-I" || line == "Line-M" || line == "Line-H" || line == "Line-P" || line == "Line-S" || line == "Line-F" || line == "Line-D" || line == "Line-G" || line == "Line-R" || line == "Line-Q")
             {
-                dDiff = GetDifferentRecords(d1, d2);
-            }
-            if (dDiff.Rows.Count > 0)
-            {
-                var ms = Environment.NewLine + "Pallet: " + pallet + ", recipe: " + recipe;
+                var sql = new SqlClass("setup_trace_new");
 
-                foreach (DataRow dr in dDiff.Rows)
-                    ms = ms + Environment.NewLine + dr[0].ToString().Trim() + "\t" + dr[1].ToString().Trim() + "\t" + dr[2].ToString().Trim() + "\tLocation: " + dr[3].ToString().Trim() + "\tFeeder: " + dr[4].ToString().Trim() + "\tTrack: " + dr[5].ToString().Trim();
+                var query = string.Format(@"SELECT TOP (100) PERCENT dbo.PackagingUnit.ComponentBarcode AS PN, dbo.RefDesignator.Name AS RefDes, dbo.PackagingUnit.PackagingUniqueId AS PUID, 
+		                   '0' as Stam1,'0' as Stam2, '0' as Stam3
+                            FROM dbo.Placement INNER JOIN
+		                    dbo.TracePlacement ON dbo.Placement.PlacementGroupId = dbo.TracePlacement.PlacementGroupId FULL OUTER JOIN
+		                    dbo.Recipe INNER JOIN
+		                    dbo.Job INNER JOIN
+		                    dbo.TraceData INNER JOIN
+		                    dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId ON dbo.Recipe.id = dbo.Job.RecipeId FULL OUTER JOIN
+		                    dbo.PCBBarcode ON dbo.TraceData.PCBBarcodeId = dbo.PCBBarcode.Id ON dbo.TracePlacement.TraceDataId = dbo.TraceData.Id FULL OUTER JOIN
+		                    dbo.RefDesignator ON dbo.Placement.RefDesignatorId = dbo.RefDesignator.Id FULL OUTER JOIN
+		                    dbo.Charge ON dbo.Placement.ChargeId = dbo.Charge.Id FULL OUTER JOIN
+		                    dbo.PackagingUnit ON dbo.Charge.PackagingUnitId = dbo.PackagingUnit.Id
+                            WHERE (dbo.PCBBarcode.Barcode = N'{0}') and (dbo.Recipe.Name like N'%{1}')", pallet, recipe);
 
-                if (StartdelayFlag)
-                    LogWriter.WriteLogTest("LastChance Not OK, " + ms, "c:\\tmp\\Traceability\\Traceability_LastChance.txt");
-                return false;
+                d2 = sql.SelectDb(query, out var Result);
+                if (Result != null)
+                    _mainForm.ErrorOut(Result);
+
+                dDiff = null;
+
+                if (d2.Rows.Count == 0 || d1.Rows.Count == 0)
+                    return false;
+
+                var thisLock = new Object();
+                lock (thisLock)
+                {
+                    dDiff = GetDifferentRecords(d1, d2);
+                }
+                if (dDiff.Rows.Count > 0)
+                {
+                    var ms = Environment.NewLine + "Pallet: " + pallet + ", recipe: " + recipe;
+
+                    foreach (DataRow dr in dDiff.Rows)
+                        ms = ms + Environment.NewLine + dr[0].ToString().Trim() + "\t" + dr[1].ToString().Trim() + "\t" + dr[2].ToString().Trim() + "\tLocation: " + dr[3].ToString().Trim() + "\tFeeder: " + dr[4].ToString().Trim() + "\tTrack: " + dr[5].ToString().Trim();
+
+                    if (StartdelayFlag)
+                        LogWriter.WriteLogTest("LastChance Not OK, " + ms, "c:\\tmp\\Traceability\\Traceability_LastChance.txt");
+                    return false;
+                }
+                else
+                {
+                    if (StartdelayFlag)
+                        LogWriter.WriteLogTest("LastChance OK, Pallet: " + pallet + ", Line: " + line + ", recipe: " + recipe, "c:\\tmp\\Traceability\\Traceability_LastChance.txt");
+                    return true;
+                }
             }
             else
             {
-                if (StartdelayFlag)
-                    LogWriter.WriteLogTest("LastChance OK, Pallet: " + pallet + ", Line: " + line + ", recipe: " + recipe, "c:\\tmp\\Traceability\\Traceability_LastChance.txt");
-                return true;
+                var sql = new SqlClass("setup_trace");
+
+                var query = string.Format(@"SELECT TOP (100) PERCENT dbo.PackagingUnit.ComponentBarcode AS PN, dbo.RefDesignator.Name AS RefDes, dbo.PackagingUnit.PackagingUniqueId AS PUID, 
+		                   '0' as Stam1,'0' as Stam2, '0' as Stam3
+                            FROM dbo.Placement INNER JOIN
+		                    dbo.TracePlacement ON dbo.Placement.PlacementGroupId = dbo.TracePlacement.PlacementGroupId FULL OUTER JOIN
+		                    dbo.Recipe INNER JOIN
+		                    dbo.Job INNER JOIN
+		                    dbo.TraceData INNER JOIN
+		                    dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId ON dbo.Recipe.id = dbo.Job.RecipeId FULL OUTER JOIN
+		                    dbo.PCBBarcode ON dbo.TraceData.PCBBarcodeId = dbo.PCBBarcode.Id ON dbo.TracePlacement.TraceDataId = dbo.TraceData.Id FULL OUTER JOIN
+		                    dbo.RefDesignator ON dbo.Placement.RefDesignatorId = dbo.RefDesignator.Id FULL OUTER JOIN
+		                    dbo.Charge ON dbo.Placement.ChargeId = dbo.Charge.Id FULL OUTER JOIN
+		                    dbo.PackagingUnit ON dbo.Charge.PackagingUnitId = dbo.PackagingUnit.Id
+                            WHERE (dbo.PCBBarcode.Barcode = N'{0}') and (dbo.Recipe.Name like N'%{1}')", pallet, recipe);
+
+                d2 = sql.SelectDb(query, out var Result);
+                if (Result != null)
+                    _mainForm.ErrorOut(Result);
+
+                dDiff = null;
+
+                if (d2.Rows.Count == 0 || d1.Rows.Count == 0)
+                    return false;
+
+                var thisLock = new Object();
+                lock (thisLock)
+                {
+                    dDiff = GetDifferentRecords(d1, d2);
+                }
+                if (dDiff.Rows.Count > 0)
+                {
+                    var ms = Environment.NewLine + "Pallet: " + pallet + ", recipe: " + recipe;
+
+                    foreach (DataRow dr in dDiff.Rows)
+                        ms = ms + Environment.NewLine + dr[0].ToString().Trim() + "\t" + dr[1].ToString().Trim() + "\t" + dr[2].ToString().Trim() + "\tLocation: " + dr[3].ToString().Trim() + "\tFeeder: " + dr[4].ToString().Trim() + "\tTrack: " + dr[5].ToString().Trim();
+
+                    if (StartdelayFlag)
+                        LogWriter.WriteLogTest("LastChance Not OK, " + ms, "c:\\tmp\\Traceability\\Traceability_LastChance.txt");
+                    return false;
+                }
+                else
+                {
+                    if (StartdelayFlag)
+                        LogWriter.WriteLogTest("LastChance OK, Pallet: " + pallet + ", Line: " + line + ", recipe: " + recipe, "c:\\tmp\\Traceability\\Traceability_LastChance.txt");
+                    return true;
+                }
             }
+
         }
 
         private List<string[]> GetMissedArray(string line, string pallet, DataTable d)
