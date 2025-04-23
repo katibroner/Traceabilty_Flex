@@ -94,8 +94,22 @@ namespace Traceabilty_Flex
                 _secret = "#Arasql2013";
                 name = _dataBaseName = "SiplaceSIS";
             }
+            else if (name == "prod")
+            {
+                _serverName = @"MIGSQLCLU1\DOC";
+                _userName = "smt";
+                _secret = "$SMTFlex2121";
+                name = _dataBaseName = "BizDocMIG";
+            }
+            else if (name == "pcb_pn")
+            {
+                _serverName = @"MIGSQLCLU4\SMT";
+                _userName = "aoi";
+                _secret = "$Flex2016 ";
+                name = _dataBaseName = "SMT_Monitor";
+            }
 
-            ConnectionString =
+                ConnectionString =
            "Data Source=" + _serverName + ";" +
            "Initial Catalog=" + name + ";" +
            "User id=" + _userName + ";" +

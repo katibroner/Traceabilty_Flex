@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -158,248 +158,347 @@ namespace Traceabilty_Flex
             return response;
         }
 
-        private static bool isBoardDubleSided(string board)
-        {
-            string originalBoard = board;
-            string str = "cs";
-            int index = originalBoard.IndexOf(str);
-            string newBoardWithinCS = originalBoard.Substring(0, index);
-            DataTable tbl = new DataTable();
-            SiplacePro.openConnection();
-            SiplacePro.sql = "SELECT    TOP (100) PERCENT dbo.AliasName.ObjectName FROM dbo.CBoard " +
-                "INNER JOIN dbo.AliasName ON dbo.CBoard.OID = dbo.AliasName.PID " +
-                "WHERE(dbo.AliasName.ObjectName LIKE N'%" + newBoardWithinCS + "%')";
-            SiplacePro.cmd.CommandText = SiplacePro.sql;
-            SiplacePro.rd = SiplacePro.cmd.ExecuteReader();
-            tbl.Load(SiplacePro.rd);
-            bool x = false;
-            for (int i = 0; i < tbl.Rows.Count; i++)
-            {
-                if (tbl.Rows[i][0].ToString().Contains("ps"))
-                {
-
-                    x = true;
-                }
-            }
-            return x;
-        }
+        /// <summary>
+        /// Validates the board for the presence of the second side (ps or cs) depending on the assembly order.
+        /// Determines the type of board through GetAssemblyOrderInfo and triggers an emergency stop if the side is not found.
+        /// </summary>
+        /// <param name="board">Name of the board with components (e.g., SK-FAB8046A_A04).</param>
+        /// <param name="pallet">Pallet barcode (unique identifier of the board in production).</param>
+        /// <param name="line">Name of the production line where the check is performed.</param>
         private void checkSideValidation(string board, string pallet, string line)
         {
+            // Get the assembly order of the board: CS->PS, PS->CS, CS, PS or null
+            string assemblyOrder = GetAssemblyOrderInfo(board);
 
-            if (!MainWindow.isBoardException(board))
+            // If data is not received or the board is single-sided — do nothing
+            if (string.IsNullOrEmpty(assemblyOrder) || assemblyOrder == "PS" || assemblyOrder == "CS")
+                return;
+
+            // First assembled Component Side (CS), now need to find Print Side (PS)
+            if (assemblyOrder == "CS->PS")
             {
-                if (board.Contains("cs"))
+                // Check for the presence of PS side (e.g., in SIPLACE or Traceability database)
+                if (!HasValidPsSide(board, pallet))
                 {
-                    if (isBoardDubleSided(board))
-                    {
-                        DataTable palletInTraceDB = new DataTable();
-                        ASMPTTraceabilityDb.openConnection();
-                        // AND (dbo.Board.Name LIKE N'%" + board + "')
-                        /*ASMPTTraceabilityDb.sql = "SELECT DISTINCT TOP(100) PERCENT dbo.PCBBarcode.Barcode AS PCBBarcode, SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe " +
-                                  "FROM dbo.PCBBarcode FULL OUTER JOIN dbo.Setup INNER JOIN dbo.Recipe INNER JOIN dbo.Job INNER JOIN " +
-                                   "dbo.TraceData INNER JOIN dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId " +
-                                   "ON dbo.Recipe.id = dbo.Job.RecipeId INNER JOIN dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id " +
-                                   "ON dbo.Setup.id = dbo.Job.SetupId INNER JOIN dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id " +
-                                   "ON dbo.PCBBarcode.Id = dbo.TraceData.PCBBarcodeId " +
-                                  "WHERE(dbo.PCBBarcode.Barcode = N'" + pallet + "') AND(SUBSTRING(dbo.Station.Name, 15, LEN(dbo.Station.Name)) LIKE 'Sipl%') ";*/
-                        string substr = "cs";
-                        int index = board.IndexOf(substr);
-                        string boardNew = board.Substring(0, index);
-                        ASMPTTraceabilityDb.sql = "SELECT DISTINCT TOP (100) PERCENT dbo.PCBBarcode.Barcode AS PCBBarcode, SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe," +
-                            " dbo.Board.Name AS Board FROM dbo.Board INNER JOIN  dbo.Setup INNER JOIN  dbo.Recipe INNER JOIN     dbo.Job INNER JOIN" +
-                            " dbo.TraceData INNER JOIN     dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId ON dbo.Job.Id = dbo.TraceJob.JobId ON dbo.Recipe.id = dbo.Job.RecipeId INNER JOIN" +
-                            " dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id ON dbo.Setup.id = dbo.Job.SetupId INNER JOIN     dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id ON dbo.Board.id = dbo.Job.BoardId FULL OUTER JOIN" +
-                            " dbo.PCBBarcode ON dbo.TraceData.PCBBarcodeId = dbo.PCBBarcode.Id WHERE     (dbo.PCBBarcode.Barcode = N'" + pallet + "')  AND (dbo.Board.Name LIKE N'%" + boardNew + "%') "; //*AND (SUBSTRING(dbo.Station.Name, 15, LEN(dbo.Station.Name)) LIKE 'Sipl%')*//
-
-                        ASMPTTraceabilityDb.cmd.CommandText = ASMPTTraceabilityDb.sql;
-                        ASMPTTraceabilityDb.rd = ASMPTTraceabilityDb.cmd.ExecuteReader();
-                        palletInTraceDB.Load(ASMPTTraceabilityDb.rd);
-                        if (palletInTraceDB.Rows.Count == 0)
-                        {
-                            _mainForm.ErrorOut("Assembly ps side not found on board :  " + pallet + " => " + line);
-                            _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly ps side not found on board:  " + pallet + " => " + line, true, "", "", board);
-
-                        }
-                        if (palletInTraceDB.Rows.Count > 0)
-                        {
-
-                            if ((!isPsExists(palletInTraceDB)) && (!isPalletIxistsInSideValidationDb(pallet)))
-                            {
-                                _mainForm.ErrorOut("Assembly ps side not found on board:  " + pallet + " => " + line);
-                                _mainForm.EmergencyStopMethod(line, null, null, " ", "Assembly ps side not found on board or Name of the board is wrong:  " + pallet + " => " + line, true, "", "", board);
-
-                            }
-                        }
-
-                    }
-
-
+                    string message = $"Assembly ps side not found on board: {pallet} => {line}";
+                    _mainForm.ErrorOut(message); // Display error in the interface
+                    _mainForm.EmergencyStopMethod(line, null, null, " ", message, true, "", "", board); // Emergency stop
+                }
+            }
+            // First assembled Print Side (PS), now need to find Component Side (CS)
+            else if (assemblyOrder == "PS->CS")
+            {
+                // Check for the presence of CS side
+                if (!HasValidComponentSide(board, pallet))
+                {
+                    string message = $"Assembly cs side not found on board: {pallet} => {line}";
+                    _mainForm.ErrorOut(message); // Display error in the interface
+                    _mainForm.EmergencyStopMethod(line, null, null, " ", message, true, "", "", board); // Emergency stop
                 }
             }
         }
 
-        private static bool isPsExists(DataTable tbl)
-        {
-            bool x = false;
-            for (int i = 0; i < tbl.Rows.Count; i++)
-            {
-                if (tbl.Rows[i][2].ToString().Contains("ps"))
-                {
-
-                    x = true;
-                }
-
-            }
-            return x;
-
-        }
-        private static bool isPalletIxistsInSideValidationDb(string pallet)
-        {
-            string connectionString = @"Data Source=migsqlclu4\smt;Initial Catalog=Traceability;Persist Security Info=True;User ID=aoi;Password=$Flex2016";
-            string qry = string.Format("IF EXISTS (SELECT TOP (1000) [Pallet] FROM [Traceability].[dbo].[SideValidation] WHERE Pallet = @plt ) SELECT 1 ELSE SELECT 0");
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                using (SqlCommand command = new SqlCommand(qry, connection))
-                {
-                    command.Parameters.AddWithValue("@plt", pallet);
-                    connection.Open();
-                    int result = (int)command.ExecuteScalar();
-                    if (result == 0)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
-
-                }
-            }
-
-        }
         /// <summary>
-        /// Validates the board side based on its placement.
-        /// If the board side is not "Bottom", it checks for pallet presence in the database.
+        /// Retrieves the assembly order of the board by its name (with components),
+        /// using the SMT_Monitor database first, then Prod.
+        /// Determines if the board is single-sided, double-sided, and which side the assembly starts from.
         /// </summary>
-        /// <param name="board">The board name</param>
-        /// <param name="pallet">The pallet barcode</param>
-        /// <param name="line">The production line name</param>
-        /// <param name="boardSide">The side of the board</param>
-        private void CheckSideValidationByPlacement(string board, string pallet, string line, string boardSide)
-        {
-            string errorMessage = $"Assembly bottom side not found on board -  {board}: {pallet} => {line}";
-            if (!MainWindow.isBoardException(board))
-            {
-                //Checks if a given board has at least two distinct placements based on its placement reference
-                if (CheckBoardSideByPlacement(board))
-                {
-                    // Check if boardSide contains the word "Bottom" (case-insensitive)
-                    if (!(boardSide.IndexOf("Bottom", StringComparison.OrdinalIgnoreCase) >= 0))
-                    {
-                        // Retrieve data from the database
-                        DataTable palletInTraceDB = GetPalletData(board, pallet);
-
-                        // Check if there are records
-                        if (palletInTraceDB.Rows.Count < 2)
-                        {
-                            LogErrorAndStop(line, pallet, board, errorMessage);
-                        }
-                    }
-                }
-            }
-
-
-
-        }
-        /// <summary>
-        /// Checks if a given board has at least two distinct placements based on its placement reference.
-        /// </summary>
-        /// <param name="boardName">The name of the board to check.</param>
-        /// <returns>Returns true if the board has at least two distinct placements; otherwise, returns false.</returns>
-        private static bool CheckBoardSideByPlacement(string boardName)
+        /// <param name="board">Name of the board (Program), as in OIB.</param>
+        /// <returns>
+        /// "PS->CS", "CS->PS", "PS", "CS" or null if nothing is found.
+        /// </returns>
+        private static string GetAssemblyOrderInfo(string board)
         {
             try
             {
-                // Open connection to the database
-                SiplacePro.openConnection();
+                // 1. Get pcb_pn from SMT_Monitor
+                var sqlMonitor = new SqlClass("pcb_pn");
+                string queryPcbPn = $"SELECT PCB_PN FROM [RecipeCurrent] WHERE Program = '{board}'";
+                var pcbPnResult = sqlMonitor.SelectDb(queryPcbPn, out string _);
 
-                // SQL query to check the count of distinct placements for a given board
-                string sql = @"SELECT COUNT(*) FROM (SELECT DISTINCT dbo.AliasName.ObjectName,  dbo.CBoardSide.bstrName, 
-            COALESCE(dbo.CPanel.spPlacementListRef, dbo.CPlacementList.OID) AS PlacementListRef
-        FROM dbo.CBoard 
-        INNER JOIN dbo.AliasName ON dbo.CBoard.OID = dbo.AliasName.PID 
-        INNER JOIN dbo.CBoardSide ON dbo.CBoard.OID = dbo.CBoardSide.PID 
-        LEFT JOIN dbo.CPanelMatrix ON dbo.CBoardSide.OID = dbo.CPanelMatrix.PID 
-        LEFT JOIN dbo.CPanel ON dbo.CPanelMatrix.OID = dbo.CPanel.PID 
-        LEFT JOIN dbo.CPlacementList ON dbo.CBoardSide.spPlacementListRef = dbo.CPlacementList.OID
-        WHERE dbo.AliasName.ObjectName = @BoardName
-        AND COALESCE(dbo.CPanel.spPlacementListRef, dbo.CPlacementList.OID) IS NOT NULL) AS SubQuery";
-
-                // Create SQL command with parameterized query to prevent SQL injection
-                using (SqlCommand cmd = new SqlCommand(sql, SiplacePro.con))
+                if (pcbPnResult.Rows.Count == 0)
                 {
-                    // Bind the board name parameter to the SQL query
-                    cmd.Parameters.AddWithValue("@BoardName", boardName);
+                    MainWindow._mWindow.ErrorOut($"PCB_PN not found for Program = {board}");
+                    return null;
+                }
 
-                    // Execute the query and retrieve the count of distinct placements
-                    int count = (int)cmd.ExecuteScalar();
+                string pcb_pn = pcbPnResult.Rows[0]["PCB_PN"].ToString();
 
+                // 2. Get the list of ASSEMBLY_ORDER
+                List<string> GetAssemblyOrders(string pn)
+                {
+                    var resultList = new List<string>();
+                    var sqlProd = new SqlClass("prod");
 
-                    // Return true if there are at least 2 placements; otherwise, return false
-                    return count == 2;
+                    string query = @"
+                SELECT ASSEMBLY_ORDER 
+                FROM [BZ_SMT_INSTR_PCB_ALL_DATA] 
+                WHERE PCB_PN = @pcbPn 
+                AND ASSEMBLY_ORDER IS NOT NULL 
+                AND LTRIM(RTRIM(ASSEMBLY_ORDER)) <> ''";
+
+                    using (var conn = new SqlConnection(sqlProd.ConnectionString))
+                    using (var cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@pcbPn", pn);
+                        try
+                        {
+                            conn.Open();
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    string order = reader["ASSEMBLY_ORDER"].ToString().Trim().ToUpper();
+                                    resultList.Add(order);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MainWindow._mWindow.ErrorOut("Error getting ASSEMBLY_ORDER: " + ex.Message);
+                        }
+                    }
+
+                    return resultList;
+                }
+
+                // First attempt — original PCB_PN
+                var orders = GetAssemblyOrders(pcb_pn);
+
+                // If nothing is found — try ML instead of NP
+                if (orders.Count == 0 && pcb_pn.StartsWith("NP"))
+                {
+                    string altPcbPn = "ML" + pcb_pn.Substring(2);
+                    orders = GetAssemblyOrders(altPcbPn);
+
+                    if (orders.Count > 0)
+                    {
+                        MainWindow._mWindow.ErrorOut($"Used alternate PCB_PN: {altPcbPn} (instead of {pcb_pn})");
+                    }
+                }
+
+                if (orders.Count == 0)
+                {
+                    MainWindow._mWindow.ErrorOut($"No ASSEMBLY_ORDER found for PCB_PN = {pcb_pn}");
+                    return null;
+                }
+                // Normalize all values in the orders list: remove spaces and convert to uppercase
+                var cleanedOrders = orders.Select(o => o.Replace(" ", "").ToUpper()).ToList();
+                // Priority: first check assembly order, then single-sided indicators
+                if (cleanedOrders.Contains("PS->CS")) return "PS->CS";
+                if (cleanedOrders.Contains("CS->PS")) return "CS->PS";
+                if (cleanedOrders.Contains("PS")) return "PS";
+                if (cleanedOrders.Contains("CS")) return "CS";
+
+                MainWindow._mWindow.ErrorOut($"Unknown ASSEMBLY_ORDER format: {string.Join(", ", orders)}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MainWindow._mWindow.ErrorOut("Error in GetAssemblyOrderInfo: " + ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the board has a second side (ps) if the first side assembled was cs.
+        /// </summary>
+        /// <param name="board">Name of the board (with components).</param>
+        /// <param name="pallet">Pallet barcode.</param>
+        /// <returns>true if the ps side is found, otherwise false.</returns>
+        private static bool HasValidPsSide(string board, string pallet)
+        {
+            if (string.IsNullOrWhiteSpace(board) || !board.Contains("cs"))
+                return true; // if it does not contain cs — not double-sided (or invalid format)
+
+            string boardBaseName = board.Substring(0, board.IndexOf("cs"));
+
+            try
+            {
+                // 1. Search in SIPLACE Pro database
+                SiplacePro.openConnection();
+                string query = "SELECT TOP 100 AliasName.ObjectName FROM dbo.CBoard " +
+                                "INNER JOIN dbo.AliasName ON CBoard.OID = AliasName.PID " +
+                                "WHERE AliasName.ObjectName LIKE @pattern";
+
+                SiplacePro.cmd.CommandText = query;
+                SiplacePro.cmd.Parameters.Clear();
+                SiplacePro.cmd.Parameters.AddWithValue("@pattern", "%" + boardBaseName + "%");
+
+                using (var reader = SiplacePro.cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader[0].ToString().Contains("ps"))
+                            return true;
+                    }
+                }
+
+                // 2. Check in SideValidation
+                using (var conn = new SqlConnection(@"Data Source=migsqlclu4\smt;Initial Catalog=Traceability;Persist Security Info=True;User ID=aoi;Password=$Flex2016 TrustServerCertificate=True"))
+                using (var cmd = new SqlCommand("SELECT 1 FROM [Traceability].[dbo].[SideValidation] WHERE Pallet = @pallet", conn))
+                {
+                    cmd.Parameters.AddWithValue("@pallet", pallet);
+                    conn.Open();
+                    var result = cmd.ExecuteScalar();
+                    if (result != null)
+                        return true;
                 }
             }
             catch (Exception ex)
             {
-                // Log error message in case of an exception
-
-                return false;
+                MainWindow._mWindow.ErrorOut("Error in HasValidPsSide: " + ex.Message);
             }
-            finally
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the board has a cs (component side) if the assembly started with ps (print side).
+        /// </summary>
+        /// <param name="board">Name of the board starting with ps.</param>
+        /// <param name="pallet">Pallet barcode.</param>
+        /// <returns>true if the cs side is found, otherwise false.</returns>
+        private static bool HasValidComponentSide(string board, string pallet)
+        {
+            if (string.IsNullOrWhiteSpace(board) || !board.Contains("ps"))
+                return true;
+
+            string boardBaseName = board.Substring(0, board.IndexOf("ps"));
+
+            try
             {
-                // Ensure the database connection is closed in any case
-                SiplacePro.closeConnection();
+                // 1. Search in SIPLACE Pro
+                SiplacePro.openConnection();
+                string query = "SELECT TOP 100 AliasName.ObjectName FROM dbo.CBoard " +
+                                "INNER JOIN dbo.AliasName ON CBoard.OID = AliasName.PID " +
+                                "WHERE AliasName.ObjectName LIKE @pattern";
+
+                SiplacePro.cmd.CommandText = query;
+                SiplacePro.cmd.Parameters.Clear();
+                SiplacePro.cmd.Parameters.AddWithValue("@pattern", "%" + boardBaseName + "%");
+
+                using (var reader = SiplacePro.cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader[0].ToString().Contains("cs"))
+                            return true;
+                    }
+                }
+
+                // 2. Check in SideValidation
+                using (var conn = new SqlConnection(@"Data Source=migsqlclu4\smt;Initial Catalog=Traceability;Persist Security Info=True;User ID=aoi;Password=$Flex2016"))
+                using (var cmd = new SqlCommand("SELECT 1 FROM [Traceability].[dbo].[SideValidation] WHERE Pallet = @pallet", conn))
+                {
+                    cmd.Parameters.AddWithValue("@pallet", pallet);
+                    conn.Open();
+                    var result = cmd.ExecuteScalar();
+                    if (result != null)
+                        return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MainWindow._mWindow.ErrorOut("Error in HasValidComponentSide: " + ex.Message);
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// Checks the correctness of the assembly of the second side of the board (Top or Bottom),
+        /// based on the assembly direction (PS->CS or CS->PS).
+        /// </summary>
+        private void CheckSideValidationByPlacement(string board, string pallet, string line, string boardSide)
+        {
+            // Get the assembly order of the board (e.g., "CS->PS", "PS->CS", "CS" or "PS")
+            string assemblyOrder = GetAssemblyOrderInfo(board);
+
+            // If the board is single-sided or no data is available — do not perform the check
+            if (string.IsNullOrEmpty(assemblyOrder) || assemblyOrder == "PS" || assemblyOrder == "CS")
+                return;
+
+            // === Case 1: The PS side (bottom) was assembled first ===
+            // Now it should be the TOP (i.e., Component Side / CS)
+            if (assemblyOrder == "PS->CS" &&
+                !(boardSide.IndexOf("Bottom", StringComparison.OrdinalIgnoreCase) >= 0)) // if the current side is not Bottom
+            {
+                // Get records for the pallet and board from the database
+                DataTable palletInTraceDB = GetPalletData(board, pallet);
+
+                // If there are fewer than two records — the second side is not assembled → error
+                if (palletInTraceDB.Rows.Count < 2)
+                {
+                    LogErrorAndStop(line, pallet, board, $"Side TOP (CS) not found - {board}: {pallet} => {line}");
+                }
+            }
+
+            // === Case 2: The CS side (top) was assembled first ===
+            // Now it should be the BOTTOM (i.e., Print Side / PS)
+            else if (assemblyOrder == "CS->PS" &&
+                !(boardSide.IndexOf("Top", StringComparison.OrdinalIgnoreCase) >= 0)) // if the current side is not Top
+            {
+                // Get records from the database
+                DataTable palletInTraceDB = GetPalletData(board, pallet);
+
+                // If there are fewer than two records — the second side is not assembled → error
+                if (palletInTraceDB.Rows.Count < 2)
+                {
+                    LogErrorAndStop(line, pallet, board, $"Side BOTTOM (PS) not found - {board}: {pallet} => {line}");
+                }
             }
         }
+
+
+
+
+
         /// <summary>
-        /// Executes a database query and retrieves pallet and board data.
+        /// Retrieves information about the pallet and board (including the BoardSide) from the Trace database.
         /// </summary>
-        /// <param name="board">The board name</param>
-        /// <param name="pallet">The pallet barcode</param>
-        /// <returns>A <see cref="DataTable"/> containing the query results</returns>
         private static DataTable GetPalletData(string board, string pallet)
         {
+            // Create the result table
             DataTable resultTable = new DataTable();
 
-            string query = @"SELECT DISTINCT TOP (100) PERCENT 
-                            dbo.PCBBarcode.Barcode AS PCBBarcode, 
-                            SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe, dbo.Job.BoardSide,
-                            dbo.Board.Name AS Board 
-                         FROM dbo.Board 
-                         INNER JOIN dbo.Setup 
-                         INNER JOIN dbo.Recipe 
-                         INNER JOIN dbo.Job 
-                         INNER JOIN dbo.TraceData 
-                         INNER JOIN dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId 
-                         ON dbo.Job.Id = dbo.TraceJob.JobId 
-                         ON dbo.Recipe.id = dbo.Job.RecipeId 
-                         INNER JOIN dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id 
-                         ON dbo.Setup.id = dbo.Job.SetupId 
-                         INNER JOIN dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id 
-                         ON dbo.Board.id = dbo.Job.BoardId 
-                         FULL OUTER JOIN dbo.PCBBarcode ON dbo.TraceData.PCBBarcodeId = dbo.PCBBarcode.Id 
-                         WHERE dbo.PCBBarcode.Barcode = @pallet 
-                         AND dbo.Board.Name LIKE @board";
+            // SQL query: search for records by pallet barcode and part of the board name
+            string query = @"
+    SELECT DISTINCT TOP (100) PERCENT 
+        dbo.PCBBarcode.Barcode AS PCBBarcode, 
+        SUBSTRING(dbo.Recipe.Name, 15, LEN(dbo.Recipe.Name)) AS Recipe, 
+        dbo.Job.BoardSide,
+        dbo.Board.Name AS Board 
+    FROM dbo.Board 
+    INNER JOIN dbo.Setup 
+    INNER JOIN dbo.Recipe 
+    INNER JOIN dbo.Job 
+    INNER JOIN dbo.TraceData 
+    INNER JOIN dbo.TraceJob ON dbo.TraceData.Id = dbo.TraceJob.TraceDataId 
+        ON dbo.Job.Id = dbo.TraceJob.JobId 
+        ON dbo.Recipe.id = dbo.Job.RecipeId 
+    INNER JOIN dbo.Station ON dbo.TraceData.StationId = dbo.Station.Id 
+        ON dbo.Setup.id = dbo.Job.SetupId 
+    INNER JOIN dbo.vOrder5 ON dbo.Job.OrderId = dbo.vOrder5.id 
+        ON dbo.Board.id = dbo.Job.BoardId 
+    FULL OUTER JOIN dbo.PCBBarcode ON dbo.TraceData.PCBBarcodeId = dbo.PCBBarcode.Id 
+    WHERE dbo.PCBBarcode.Barcode = @pallet 
+    AND dbo.Board.Name LIKE @board";
 
+            // Connect to the ASMPTTraceabilityDb database
             using (SqlConnection connection = new SqlConnection(ASMPTTraceabilityDb.GetConnectionString()))
             {
                 connection.Open();
+
+                // Create the SQL command
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    // Add parameters to prevent SQL injection
+                    // Insert parameters into the query
                     command.Parameters.AddWithValue("@pallet", pallet);
                     command.Parameters.AddWithValue("@board", "%" + board + "%");
 
+                    // Load the result into the table
                     using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                     {
                         adapter.Fill(resultTable);
@@ -407,23 +506,29 @@ namespace Traceabilty_Flex
                 }
             }
 
+            // Return the table
             return resultTable;
         }
+
+
+
         /// <summary>
-        /// Logs an error message and triggers an emergency stop.
+        /// Logs an error message and triggers an emergency stop of the line.
         /// </summary>
-        /// <param name="line">The production line name</param>
-        /// <param name="pallet">The pallet barcode</param>
-        /// <param name="board">The board name</param>
         private void LogErrorAndStop(string line, string pallet, string board, string errorMessage)
         {
+            // Display the error on the screen (or log)
+            //_mainForm.ErrorOut(errorMessage);
 
-
-            // Log the error
-            _mainForm.ErrorOut(errorMessage);
-
-            // Perform an emergency stop
-            _mainForm.EmergencyStopMethod(line, null, null, " ", errorMessage, true, "", "", board);
+            // Trigger the line stop
+            _mainForm.EmergencyStopMethod(
+                line,       // line
+                null,       // list of parts (not used here)
+                null,       // list of missing components
+                " ",        // recipe
+                errorMessage, // error message
+                true,       // is EmergencyStop active
+                "", "", board); // additional parameters and board name
         }
 
         private string GetLineSide(string line, string Convayer)
