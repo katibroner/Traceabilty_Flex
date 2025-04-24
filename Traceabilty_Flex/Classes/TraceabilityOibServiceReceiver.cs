@@ -159,59 +159,58 @@ namespace Traceabilty_Flex
         }
 
         /// <summary>
-        /// Validates the board for the presence of the second side (ps or cs) depending on the assembly order.
-        /// Determines the type of board through GetAssemblyOrderInfo and triggers an emergency stop if the side is not found.
+        /// Выполняет валидацию платы на наличие второй стороны (ps или cs) в зависимости от порядка сборки.
+        /// Определяет тип платы через GetAssemblyOrderInfo и вызывает аварийную остановку, если сторона не найдена.
         /// </summary>
-        /// <param name="board">Name of the board with components (e.g., SK-FAB8046A_A04).</param>
-        /// <param name="pallet">Pallet barcode (unique identifier of the board in production).</param>
-        /// <param name="line">Name of the production line where the check is performed.</param>
+        /// <param name="board">Имя платы с компонентами (например, SK-FAB8046A_A04).</param>
+        /// <param name="pallet">Штрихкод паллеты (уникальный идентификатор платы в производстве).</param>
+        /// <param name="line">Имя производственной линии, на которой идёт проверка.</param>
         private void checkSideValidation(string board, string pallet, string line)
         {
-            // Get the assembly order of the board: CS->PS, PS->CS, CS, PS or null
+            // Получаем порядок сборки платы: CS->PS, PS->CS, CS, PS или null
             string assemblyOrder = GetAssemblyOrderInfo(board);
 
-            // If data is not received or the board is single-sided — do nothing
+            // Если данные не получены или плата односторонняя — ничего не делаем
             if (string.IsNullOrEmpty(assemblyOrder) || assemblyOrder == "PS" || assemblyOrder == "CS")
                 return;
 
-            // First assembled Component Side (CS), now need to find Print Side (PS)
+            //  сначала собрали Component Side (CS), значит теперь нужно найти Print Side (PS)
             if (assemblyOrder == "CS->PS")
             {
-                // Check for the presence of PS side (e.g., in SIPLACE or Traceability database)
+                // Проверяем наличие стороны PS (например, в базе SIPLACE или Traceability)
                 if (!HasValidPsSide(board, pallet))
                 {
                     string message = $"Assembly ps side not found on board: {pallet} => {line}";
-                    _mainForm.ErrorOut(message); // Display error in the interface
-                    _mainForm.EmergencyStopMethod(line, null, null, " ", message, true, "", "", board); // Emergency stop
+                    _mainForm.ErrorOut(message); // Показываем ошибку в интерфейсе
+                    _mainForm.EmergencyStopMethod(line, null, null, " ", message, true, "", "", board); // Аварийная остановка
                 }
             }
-            // First assembled Print Side (PS), now need to find Component Side (CS)
+            // сначала собрали Print Side (PS), значит теперь нужно найти Component Side (CS)
             else if (assemblyOrder == "PS->CS")
             {
-                // Check for the presence of CS side
+                // Проверяем наличие стороны CS
                 if (!HasValidComponentSide(board, pallet))
                 {
                     string message = $"Assembly cs side not found on board: {pallet} => {line}";
-                    _mainForm.ErrorOut(message); // Display error in the interface
-                    _mainForm.EmergencyStopMethod(line, null, null, " ", message, true, "", "", board); // Emergency stop
+                    _mainForm.ErrorOut(message); // Показываем ошибку в интерфейсе
+                    _mainForm.EmergencyStopMethod(line, null, null, " ", message, true, "", "", board); // Аварийная остановка
                 }
             }
         }
-
         /// <summary>
-        /// Retrieves the assembly order of the board by its name (with components),
-        /// using the SMT_Monitor database first, then Prod.
-        /// Determines if the board is single-sided, double-sided, and which side the assembly starts from.
+        /// Получает порядок сборки платы по имени board (с компонентами),
+        /// используя сначала базу SMT_Monitor, затем Prod.
+        /// Определяет: плата односторонняя, двухсторонняя, и с какой стороны начинается сборка.
         /// </summary>
-        /// <param name="board">Name of the board (Program), as in OIB.</param>
+        /// <param name="board">Имя платы (Program), как в OIB.</param>
         /// <returns>
-        /// "PS->CS", "CS->PS", "PS", "CS" or null if nothing is found.
+        /// "PS->CS", "CS->PS", "PS", "CS" или null, если ничего не найдено.
         /// </returns>
-        private static string GetAssemblyOrderInfo(string board)
+        private string GetAssemblyOrderInfo(string board)
         {
             try
             {
-                // 1. Get pcb_pn from SMT_Monitor
+                // 1. Получаем pcb_pn из SMT_Monitor
                 var sqlMonitor = new SqlClass("pcb_pn");
                 string queryPcbPn = $"SELECT PCB_PN FROM [RecipeCurrent] WHERE Program = '{board}'";
                 var pcbPnResult = sqlMonitor.SelectDb(queryPcbPn, out string _);
@@ -224,18 +223,18 @@ namespace Traceabilty_Flex
 
                 string pcb_pn = pcbPnResult.Rows[0]["PCB_PN"].ToString();
 
-                // 2. Get the list of ASSEMBLY_ORDER
+                // 2. Получаем список ASSEMBLY_ORDER
                 List<string> GetAssemblyOrders(string pn)
                 {
                     var resultList = new List<string>();
                     var sqlProd = new SqlClass("prod");
 
                     string query = @"
-                SELECT ASSEMBLY_ORDER 
-                FROM [BZ_SMT_INSTR_PCB_ALL_DATA] 
-                WHERE PCB_PN = @pcbPn 
-                AND ASSEMBLY_ORDER IS NOT NULL 
-                AND LTRIM(RTRIM(ASSEMBLY_ORDER)) <> ''";
+						SELECT ASSEMBLY_ORDER 
+						FROM [BZ_SMT_INSTR_PCB_ALL_DATA] 
+						WHERE PCB_PN = @pcbPn 
+						AND ASSEMBLY_ORDER IS NOT NULL 
+						AND LTRIM(RTRIM(ASSEMBLY_ORDER)) <> ''";
 
                     using (var conn = new SqlConnection(sqlProd.ConnectionString))
                     using (var cmd = new SqlCommand(query, conn))
@@ -262,10 +261,10 @@ namespace Traceabilty_Flex
                     return resultList;
                 }
 
-                // First attempt — original PCB_PN
+                // Первая попытка — оригинальный PCB_PN
                 var orders = GetAssemblyOrders(pcb_pn);
 
-                // If nothing is found — try ML instead of NP
+                // Если ничего не нашли — пробуем ML вместо NP
                 if (orders.Count == 0 && pcb_pn.StartsWith("NP"))
                 {
                     string altPcbPn = "ML" + pcb_pn.Substring(2);
@@ -282,13 +281,12 @@ namespace Traceabilty_Flex
                     MainWindow._mWindow.ErrorOut($"No ASSEMBLY_ORDER found for PCB_PN = {pcb_pn}");
                     return null;
                 }
-                // Normalize all values in the orders list: remove spaces and convert to uppercase
-                var cleanedOrders = orders.Select(o => o.Replace(" ", "").ToUpper()).ToList();
-                // Priority: first check assembly order, then single-sided indicators
-                if (cleanedOrders.Contains("PS->CS")) return "PS->CS";
-                if (cleanedOrders.Contains("CS->PS")) return "CS->PS";
-                if (cleanedOrders.Contains("PS")) return "PS";
-                if (cleanedOrders.Contains("CS")) return "CS";
+
+                // Приоритет: сначала смотрим порядок сборки, затем односторонние признаки
+                if (orders.Contains("PS->CS")) return "PS->CS";
+                if (orders.Contains("CS->PS")) return "CS->PS";
+                if (orders.Contains("PS")) return "PS";
+                if (orders.Contains("CS")) return "CS";
 
                 MainWindow._mWindow.ErrorOut($"Unknown ASSEMBLY_ORDER format: {string.Join(", ", orders)}");
                 return null;
@@ -299,23 +297,22 @@ namespace Traceabilty_Flex
                 return null;
             }
         }
-
         /// <summary>
-        /// Checks if the board has a second side (ps) if the first side assembled was cs.
+        /// Проверяет, есть ли у платы вторая сторона (ps), если первой была собрана сторона cs.
         /// </summary>
-        /// <param name="board">Name of the board (with components).</param>
-        /// <param name="pallet">Pallet barcode.</param>
-        /// <returns>true if the ps side is found, otherwise false.</returns>
+        /// <param name="board">Имя платы (с компонентами).</param>
+        /// <param name="pallet">Штрихкод поддона.</param>
+        /// <returns>true — если найдена сторона ps, иначе false.</returns>
         private static bool HasValidPsSide(string board, string pallet)
         {
             if (string.IsNullOrWhiteSpace(board) || !board.Contains("cs"))
-                return true; // if it does not contain cs — not double-sided (or invalid format)
+                return true; // если не содержит cs — не двухсторонняя (или неформат)
 
             string boardBaseName = board.Substring(0, board.IndexOf("cs"));
 
             try
             {
-                // 1. Search in SIPLACE Pro database
+                // 1. Поиск в базе SIPLACE Pro
                 SiplacePro.openConnection();
                 string query = "SELECT TOP 100 AliasName.ObjectName FROM dbo.CBoard " +
                                 "INNER JOIN dbo.AliasName ON CBoard.OID = AliasName.PID " +
@@ -334,8 +331,8 @@ namespace Traceabilty_Flex
                     }
                 }
 
-                // 2. Check in SideValidation
-                using (var conn = new SqlConnection(@"Data Source=migsqlclu4\smt;Initial Catalog=Traceability;Persist Security Info=True;User ID=aoi;Password=$Flex2016 TrustServerCertificate=True"))
+                // 2. Проверка в SideValidation
+                using (var conn = new SqlConnection(@"Data Source=migsqlclu4\smt;Initial Catalog=Traceability;Persist Security Info=True;User ID=aoi;Password=$Flex2016"))
                 using (var cmd = new SqlCommand("SELECT 1 FROM [Traceability].[dbo].[SideValidation] WHERE Pallet = @pallet", conn))
                 {
                     cmd.Parameters.AddWithValue("@pallet", pallet);
@@ -352,13 +349,13 @@ namespace Traceabilty_Flex
 
             return false;
         }
-
         /// <summary>
-        /// Checks if the board has a cs (component side) if the assembly started with ps (print side).
+        /// Проверяет, есть ли у платы сторона cs (component side),
+        /// если сборка началась с ps (print side).
         /// </summary>
-        /// <param name="board">Name of the board starting with ps.</param>
-        /// <param name="pallet">Pallet barcode.</param>
-        /// <returns>true if the cs side is found, otherwise false.</returns>
+        /// <param name="board">Имя платы, начинающееся с ps.</param>
+        /// <param name="pallet">Штрихкод паллеты.</param>
+        /// <returns>true — если сторона cs найдена, иначе false.</returns>
         private static bool HasValidComponentSide(string board, string pallet)
         {
             if (string.IsNullOrWhiteSpace(board) || !board.Contains("ps"))
@@ -368,7 +365,7 @@ namespace Traceabilty_Flex
 
             try
             {
-                // 1. Search in SIPLACE Pro
+                // 1. Поиск в SIPLACE Pro
                 SiplacePro.openConnection();
                 string query = "SELECT TOP 100 AliasName.ObjectName FROM dbo.CBoard " +
                                 "INNER JOIN dbo.AliasName ON CBoard.OID = AliasName.PID " +
@@ -387,7 +384,7 @@ namespace Traceabilty_Flex
                     }
                 }
 
-                // 2. Check in SideValidation
+                // 2. Проверка в SideValidation
                 using (var conn = new SqlConnection(@"Data Source=migsqlclu4\smt;Initial Catalog=Traceability;Persist Security Info=True;User ID=aoi;Password=$Flex2016"))
                 using (var cmd = new SqlCommand("SELECT 1 FROM [Traceability].[dbo].[SideValidation] WHERE Pallet = @pallet", conn))
                 {
@@ -405,65 +402,117 @@ namespace Traceabilty_Flex
 
             return false;
         }
-
-
         /// <summary>
-        /// Checks the correctness of the assembly of the second side of the board (Top or Bottom),
-        /// based on the assembly direction (PS->CS or CS->PS).
+        /// Проверяет правильность сборки второй стороны платы (Top или Bottom),
+        /// на основе направления сборки (PS->CS или CS->PS).
         /// </summary>
         private void CheckSideValidationByPlacement(string board, string pallet, string line, string boardSide)
         {
-            // Get the assembly order of the board (e.g., "CS->PS", "PS->CS", "CS" or "PS")
+            // Получаем порядок сборки платы (например: "CS->PS", "PS->CS", "CS" или "PS")
             string assemblyOrder = GetAssemblyOrderInfo(board);
 
-            // If the board is single-sided or no data is available — do not perform the check
+            // Если плата односторонняя или данных нет — не выполняем проверку
             if (string.IsNullOrEmpty(assemblyOrder) || assemblyOrder == "PS" || assemblyOrder == "CS")
                 return;
 
-            // === Case 1: The PS side (bottom) was assembled first ===
-            // Now it should be the TOP (i.e., Component Side / CS)
-            if (assemblyOrder == "PS->CS" &&
-                !(boardSide.IndexOf("Bottom", StringComparison.OrdinalIgnoreCase) >= 0)) // if the current side is not Bottom
+            // Проверяем, действительно ли у платы есть две стороны (две сборки/размещения)
+            if (CheckBoardSideByPlacement(board))
             {
-                // Get records for the pallet and board from the database
-                DataTable palletInTraceDB = GetPalletData(board, pallet);
-
-                // If there are fewer than two records — the second side is not assembled → error
-                if (palletInTraceDB.Rows.Count < 2)
+                // === Случай 1: Сначала была собрана сторона PS (нижняя) ===
+                // Значит сейчас должна быть TOP (то есть Component Side / CS)
+                if (assemblyOrder == "PS->CS" &&
+                    !(boardSide.IndexOf("Top", StringComparison.OrdinalIgnoreCase) >= 0)) // если текущая сторона не Top
                 {
-                    LogErrorAndStop(line, pallet, board, $"Side TOP (CS) not found - {board}: {pallet} => {line}");
+                    // Получаем записи по паллете и плате из базы
+                    DataTable palletInTraceDB = GetPalletData(board, pallet);
+
+                    // Если записей меньше двух — вторая сторона не собрана → ошибка
+                    if (palletInTraceDB.Rows.Count < 2)
+                    {
+                        LogErrorAndStop(line, pallet, board, $"Сторона TOP (CS) не найдена на плате - {board}: {pallet} => {line}");
+                    }
                 }
-            }
 
-            // === Case 2: The CS side (top) was assembled first ===
-            // Now it should be the BOTTOM (i.e., Print Side / PS)
-            else if (assemblyOrder == "CS->PS" &&
-                !(boardSide.IndexOf("Top", StringComparison.OrdinalIgnoreCase) >= 0)) // if the current side is not Top
-            {
-                // Get records from the database
-                DataTable palletInTraceDB = GetPalletData(board, pallet);
-
-                // If there are fewer than two records — the second side is not assembled → error
-                if (palletInTraceDB.Rows.Count < 2)
+                // === Случай 2: Сначала была собрана сторона CS (верхняя) ===
+                // Значит сейчас должна быть BOTTOM (то есть Print Side / PS)
+                else if (assemblyOrder == "CS->PS" &&
+                    !(boardSide.IndexOf("Bottom", StringComparison.OrdinalIgnoreCase) >= 0)) // если текущая сторона не Bottom
                 {
-                    LogErrorAndStop(line, pallet, board, $"Side BOTTOM (PS) not found - {board}: {pallet} => {line}");
+                    // Получаем записи из базы
+                    DataTable palletInTraceDB = GetPalletData(board, pallet);
+
+                    // Если записей меньше двух — вторая сторона не собрана → ошибка
+                    if (palletInTraceDB.Rows.Count < 2)
+                    {
+                        LogErrorAndStop(line, pallet, board, $"Сторона BOTTOM (PS) не найдена на плате - {board}: {pallet} => {line}");
+                    }
                 }
             }
         }
 
 
+        /// <summary>
+        /// Проверяет, есть ли у платы две стороны на основе количества уникальных списков размещения (PlacementList).
+        /// </summary>
+        private static bool CheckBoardSideByPlacement(string boardName)
+        {
+            try
+            {
+                // Открываем подключение к базе SiplacePro
+                SiplacePro.openConnection();
 
+                // SQL-запрос: выбираем количество уникальных размещений (PlacementRef), привязанных к двум сторонам платы
+                string sql = @"
+        SELECT COUNT(*) FROM (
+            SELECT DISTINCT 
+                dbo.AliasName.ObjectName,  
+                dbo.CBoardSide.bstrName, 
+                COALESCE(dbo.CPanel.spPlacementListRef, dbo.CPlacementList.OID) AS PlacementListRef
+            FROM dbo.CBoard 
+            INNER JOIN dbo.AliasName ON dbo.CBoard.OID = dbo.AliasName.PID 
+            INNER JOIN dbo.CBoardSide ON dbo.CBoard.OID = dbo.CBoardSide.PID 
+            LEFT JOIN dbo.CPanelMatrix ON dbo.CBoardSide.OID = dbo.CPanelMatrix.PID 
+            LEFT JOIN dbo.CPanel ON dbo.CPanelMatrix.OID = dbo.CPanel.PID 
+            LEFT JOIN dbo.CPlacementList ON dbo.CBoardSide.spPlacementListRef = dbo.CPlacementList.OID
+            WHERE dbo.AliasName.ObjectName = @BoardName
+            AND COALESCE(dbo.CPanel.spPlacementListRef, dbo.CPlacementList.OID) IS NOT NULL
+        ) AS SubQuery";
+
+                // Создаём SQL-команду с параметром
+                using (SqlCommand cmd = new SqlCommand(sql, SiplacePro.con))
+                {
+                    // Привязываем имя платы к параметру
+                    cmd.Parameters.AddWithValue("@BoardName", boardName);
+
+                    // Выполняем запрос и получаем число уникальных размещений
+                    int count = (int)cmd.ExecuteScalar();
+
+                    // Если два — значит плата двухсторонняя
+                    return count == 2;
+                }
+            }
+            catch (Exception)
+            {
+                // В случае ошибки возвращаем false
+                return false;
+            }
+            finally
+            {
+                // Закрываем соединение в любом случае
+                SiplacePro.closeConnection();
+            }
+        }
 
 
         /// <summary>
-        /// Retrieves information about the pallet and board (including the BoardSide) from the Trace database.
+        /// Получает информацию о поддоне и плате (включая сторону BoardSide) из базы Trace.
         /// </summary>
         private static DataTable GetPalletData(string board, string pallet)
         {
-            // Create the result table
+            // Создаём результирующую таблицу
             DataTable resultTable = new DataTable();
 
-            // SQL query: search for records by pallet barcode and part of the board name
+            // SQL-запрос: ищем записи по штрихкоду поддона и части названия платы
             string query = @"
     SELECT DISTINCT TOP (100) PERCENT 
         dbo.PCBBarcode.Barcode AS PCBBarcode, 
@@ -486,19 +535,19 @@ namespace Traceabilty_Flex
     WHERE dbo.PCBBarcode.Barcode = @pallet 
     AND dbo.Board.Name LIKE @board";
 
-            // Connect to the ASMPTTraceabilityDb database
+            // Подключение к базе данных ASMPTTraceabilityDb
             using (SqlConnection connection = new SqlConnection(ASMPTTraceabilityDb.GetConnectionString()))
             {
                 connection.Open();
 
-                // Create the SQL command
+                // Создаём SQL-команду
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    // Insert parameters into the query
+                    // Подставляем параметры в запрос
                     command.Parameters.AddWithValue("@pallet", pallet);
                     command.Parameters.AddWithValue("@board", "%" + board + "%");
 
-                    // Load the result into the table
+                    // Загружаем результат в таблицу
                     using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                     {
                         adapter.Fill(resultTable);
@@ -506,31 +555,30 @@ namespace Traceabilty_Flex
                 }
             }
 
-            // Return the table
+            // Возвращаем таблицу
             return resultTable;
         }
 
 
 
         /// <summary>
-        /// Logs an error message and triggers an emergency stop of the line.
+        /// Записывает сообщение об ошибке в лог и вызывает аварийную остановку линии.
         /// </summary>
         private void LogErrorAndStop(string line, string pallet, string board, string errorMessage)
         {
-            // Display the error on the screen (or log)
-            //_mainForm.ErrorOut(errorMessage);
+            // Вывод ошибки на экран (или лог)
+            _mainForm.ErrorOut(errorMessage);
 
-            // Trigger the line stop
+            // Вызываем остановку линии
             _mainForm.EmergencyStopMethod(
-                line,       // line
-                null,       // list of parts (not used here)
-                null,       // list of missing components
-                " ",        // recipe
-                errorMessage, // error message
-                true,       // is EmergencyStop active
-                "", "", board); // additional parameters and board name
+                line,       // линия
+                null,       // список деталей (не используется здесь)
+                null,       // список пропущенных компонентов
+                " ",        // рецепт
+                errorMessage, // сообщение ошибки
+                true,       // активен ли EmergencyStop
+                "", "", board); // дополнительные параметры и имя платы
         }
-
         private string GetLineSide(string line, string Convayer)
         {
             if (line.Contains("Line-R"))// Line R Convayer
