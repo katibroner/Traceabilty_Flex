@@ -197,52 +197,66 @@ namespace Traceabilty_Flex
                 }
             }
         }
+        ///////////////
+        /////////////////
         /// <summary>
-        /// Получает порядок сборки платы по имени board (с компонентами),
-        /// используя сначала базу SMT_Monitor, затем Prod.
-        /// Определяет: плата односторонняя, двухсторонняя, и с какой стороны начинается сборка.
+        /// Получает направление сборки платы (ASSEMBLY_ORDER) по имени программы (board).
+        /// Сначала извлекает артикул платы (PCB_PN) и её ревизию (PCB_Rev) из базы SMT_Monitor,
+        /// затем ищет направление сборки в базе PROD.
         /// </summary>
-        /// <param name="board">Имя платы (Program), как в OIB.</param>
+        /// <param name="board">Имя программы платы (например, SK-FAB8046A_A04).</param>
         /// <returns>
-        /// "PS->CS", "CS->PS", "PS", "CS" или null, если ничего не найдено.
+        /// Возвращает одно из значений: "PS->CS", "CS->PS", "PS", "CS" или null, если ничего не найдено.
         /// </returns>
         private string GetAssemblyOrderInfo(string board)
         {
             try
             {
-                // 1. Получаем pcb_pn из SMT_Monitor
+                // Шаг 1: Получаем PCB_PN и PCB_Rev из базы SMT_Monitor по имени программы board
                 var sqlMonitor = new SqlClass("pcb_pn");
-                string queryPcbPn = $"SELECT PCB_PN FROM [RecipeCurrent] WHERE Program = '{board}'";
+
+                // SQL-запрос на получение артикула платы и ревизии
+                string queryPcbPn = $"SELECT PCB_PN, PCB_Rev FROM [RecipeCurrent] WHERE Program = '{board}'";
                 var pcbPnResult = sqlMonitor.SelectDb(queryPcbPn, out string _);
 
+                // Если плата не найдена — сообщаем об ошибке и возвращаем null
                 if (pcbPnResult.Rows.Count == 0)
                 {
-                    MainWindow._mWindow.ErrorOut($"PCB_PN not found for Program = {board}");
+                    MainWindow._mWindow.ErrorOut($"Не найден PCB_PN для Program = {board}");
                     return null;
                 }
 
+                // Извлекаем артикул и ревизию из результатов запроса
                 string pcb_pn = pcbPnResult.Rows[0]["PCB_PN"].ToString();
+                string pcb_rev = pcbPnResult.Rows[0]["PCB_Rev"].ToString();
 
-                // 2. Получаем список ASSEMBLY_ORDER
-                List<string> GetAssemblyOrders(string pn)
+                // Шаг 2: Локальная функция для получения списка направлений сборки по PN и REV
+                List<string> GetAssemblyOrders(string pn, string rev)
                 {
                     var resultList = new List<string>();
                     var sqlProd = new SqlClass("prod");
 
+                    // SQL-запрос с параметрами для получения ASSEMBLY_ORDER
                     string query = @"
-						SELECT ASSEMBLY_ORDER 
-						FROM [BZ_SMT_INSTR_PCB_ALL_DATA] 
-						WHERE PCB_PN = @pcbPn 
-						AND ASSEMBLY_ORDER IS NOT NULL 
-						AND LTRIM(RTRIM(ASSEMBLY_ORDER)) <> ''";
+                SELECT ASSEMBLY_ORDER 
+                FROM [BZ_SMT_INSTR_PCB_ALL_DATA] 
+                WHERE PCB_PN = @pcbPn 
+                  AND REVISION = @revision
+                  AND ASSEMBLY_ORDER IS NOT NULL 
+                  AND LTRIM(RTRIM(ASSEMBLY_ORDER)) <> ''";
 
                     using (var conn = new SqlConnection(sqlProd.ConnectionString))
                     using (var cmd = new SqlCommand(query, conn))
                     {
+                        // Передаём параметры в запрос
                         cmd.Parameters.AddWithValue("@pcbPn", pn);
+                        cmd.Parameters.AddWithValue("@revision", rev);
+
                         try
                         {
                             conn.Open();
+
+                            // Считываем результаты и очищаем от пробелов
                             using (var reader = cmd.ExecuteReader())
                             {
                                 while (reader.Read())
@@ -254,55 +268,57 @@ namespace Traceabilty_Flex
                         }
                         catch (Exception ex)
                         {
-                            MainWindow._mWindow.ErrorOut("Error getting ASSEMBLY_ORDER: " + ex.Message);
+                            MainWindow._mWindow.ErrorOut("Ошибка при получении ASSEMBLY_ORDER: " + ex.Message);
                         }
                     }
 
                     return resultList;
                 }
 
-                // Первая попытка — оригинальный PCB_PN
-                var orders = GetAssemblyOrders(pcb_pn);
+                // Основная попытка — использовать исходный PCB_PN
+                var orders = GetAssemblyOrders(pcb_pn, pcb_rev);
 
-                // Если ничего не нашли — пробуем ML вместо NP
+                // Резервная попытка — если артикул начинается с "NP", пробуем "ML" вместо него
                 if (orders.Count == 0 && pcb_pn.StartsWith("NP"))
                 {
                     string altPcbPn = "ML" + pcb_pn.Substring(2);
-                    orders = GetAssemblyOrders(altPcbPn);
+                    orders = GetAssemblyOrders(altPcbPn, pcb_rev);
 
                     if (orders.Count > 0)
                     {
-                        MainWindow._mWindow.ErrorOut($"Used alternate PCB_PN: {altPcbPn} (instead of {pcb_pn})");
+                        MainWindow._mWindow.ErrorOut($"Альтернативный PCB_PN: {altPcbPn} (вместо {pcb_pn})");
                     }
                 }
 
+                // Если не нашли ASSEMBLY_ORDER — возвращаем null
                 if (orders.Count == 0)
                 {
-                    MainWindow._mWindow.ErrorOut($"No ASSEMBLY_ORDER found for PCB_PN = {pcb_pn}");
+                    MainWindow._mWindow.ErrorOut($"ASSEMBLY_ORDER не найден для PCB_PN = {pcb_pn}, REV = {pcb_rev}");
                     return null;
                 }
 
-                // Приоритет: сначала смотрим порядок сборки, затем односторонние признаки
-                if (orders.Contains("PS->CS")) return "PS->CS";
-                if (orders.Contains("CS->PS")) return "CS->PS";
-                if (orders.Contains("PS")) return "PS";
-                if (orders.Contains("CS")) return "CS";
+                // Приоритет: сначала ищем двухсторонние форматы, затем односторонние
+                if (orders.Any(o => o.Replace(" ", "") == "PS->CS")) return "PS->CS";
+                if (orders.Any(o => o.Replace(" ", "") == "CS->PS")) return "CS->PS";
+                if (orders.Any(o => o.Replace(" ", "") == "PS")) return "PS";
+                if (orders.Any(o => o.Replace(" ", "") == "CS")) return "CS";
 
-                MainWindow._mWindow.ErrorOut($"Unknown ASSEMBLY_ORDER format: {string.Join(", ", orders)}");
+                // Если формат неизвестен — логируем и возвращаем null
+                MainWindow._mWindow.ErrorOut($"Неизвестный формат ASSEMBLY_ORDER: {string.Join(", ", orders)}");
                 return null;
             }
             catch (Exception ex)
             {
-                MainWindow._mWindow.ErrorOut("Error in GetAssemblyOrderInfo: " + ex.Message);
+                // В случае исключения — логируем и возвращаем null
+                MainWindow._mWindow.ErrorOut("Ошибка в GetAssemblyOrderInfo: " + ex.Message);
                 return null;
             }
-        }
-        /// <summary>
-        /// Проверяет, есть ли у платы вторая сторона (ps), если первой была собрана сторона cs.
-        /// </summary>
-        /// <param name="board">Имя платы (с компонентами).</param>
-        /// <param name="pallet">Штрихкод поддона.</param>
-        /// <returns>true — если найдена сторона ps, иначе false.</returns>
+        }        /// <summary>
+                 /// Проверяет, есть ли у платы вторая сторона (ps), если первой была собрана сторона cs.
+                 /// </summary>
+                 /// <param name="board">Имя платы (с компонентами).</param>
+                 /// <param name="pallet">Штрихкод поддона.</param>
+                 /// <returns>true — если найдена сторона ps, иначе false.</returns>
         private static bool HasValidPsSide(string board, string pallet)
         {
             if (string.IsNullOrWhiteSpace(board) || !board.Contains("cs"))
